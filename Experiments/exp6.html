@@ -1,0 +1,1263 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Cake Ordering System</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #fff5f7;
+    color: #333;
+}
+
+header {
+    background: #be185d;
+    color: white;
+    padding: 22px;
+    text-align: center;
+}
+
+nav {
+    background: #831843;
+    padding: 12px;
+    text-align: center;
+}
+
+nav button {
+    background: transparent;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.container {
+    width: 92%;
+    max-width: 1150px;
+    margin: 25px auto;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px #ead5dd;
+}
+
+h2, h3 {
+    color: #be185d;
+    margin-bottom: 15px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 11px;
+    margin: 7px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button, .btn {
+    background: #db2777;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px 2px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button:hover, .btn:hover {
+    background: #9d174d;
+}
+
+.delete {
+    background: #dc2626;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.cake-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.cake {
+    border: 1px solid #f3d3df;
+    border-radius: 10px;
+    overflow: hidden;
+    padding-bottom: 12px;
+    text-align: center;
+}
+
+.cake img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.cake h3 {
+    margin: 12px 5px;
+}
+
+.cake p {
+    margin: 8px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+th, td {
+    border: 1px solid #eee;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background: #be185d;
+    color: white;
+}
+
+footer {
+    background: #831843;
+    color: white;
+    text-align: center;
+    padding: 18px;
+    margin-top: 30px;
+}
+
+@media(max-width: 600px) {
+    .container {
+        width: 96%;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 5px;
+    }
+
+    nav button {
+        padding: 7px;
+        font-size: 13px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎂 Sweet Cake Shop</h1>
+    <p>Order Your Favourite Cake Online</p>
+</header>
+
+<nav>
+    <button onclick="showSection('shop')">Home / Cakes</button>
+    <button onclick="showSection('login')">Login</button>
+    <button onclick="showSection('register')">Register</button>
+    <button onclick="showSection('cart')">Cart (<span id="cartCount">0</span>)</button>
+    <button onclick="showSection('orders')">My Orders</button>
+    <button onclick="showSection('adminLogin')">Admin</button>
+    <button onclick="logout()">Logout</button>
+</nav>
+
+<div class="container">
+
+<!-- SHOP -->
+<section id="shop" class="card">
+    <h2>Explore Our Cakes</h2>
+
+    <input id="search" placeholder="Search cakes..."
+           oninput="displayCakes()">
+
+    <select id="category" onchange="displayCakes()">
+        <option value="">All Categories</option>
+        <option>Birthday</option>
+        <option>Wedding</option>
+        <option>Chocolate</option>
+        <option>Fruit</option>
+        <option>Anniversary</option>
+    </select>
+
+    <select id="flavor" onchange="displayCakes()">
+        <option value="">All Flavours</option>
+        <option>Chocolate</option>
+        <option>Vanilla</option>
+        <option>Strawberry</option>
+        <option>Black Forest</option>
+        <option>Red Velvet</option>
+    </select>
+
+    <label>Minimum Price (₹)</label>
+    <input type="number" id="minPrice" value="0"
+           min="0" oninput="displayCakes()">
+
+    <label>Maximum Price (₹)</label>
+    <input type="number" id="maxPrice" value="5000"
+           min="0" oninput="displayCakes()">
+
+    <div id="cakeList" class="cake-grid"></div>
+</section>
+
+<!-- REGISTER -->
+<section id="register" class="card hidden">
+    <h2>Customer Registration</h2>
+
+    <input id="regName" placeholder="Full Name">
+    <input id="regEmail" type="email" placeholder="Email">
+    <input id="regPassword" type="password" placeholder="Password">
+
+    <button onclick="register()">Register</button>
+</section>
+
+<!-- LOGIN -->
+<section id="login" class="card hidden">
+    <h2>Customer Login</h2>
+
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+</section>
+
+<!-- ADMIN LOGIN -->
+<section id="adminLogin" class="card hidden">
+    <h2>Admin Login</h2>
+
+    <input id="adminEmail" type="email" placeholder="Admin Email">
+    <input id="adminPassword" type="password" placeholder="Password">
+
+    <button onclick="adminLogin()">Login as Admin</button>
+</section>
+
+<!-- CART -->
+<section id="cart" class="card hidden">
+    <h2>Shopping Cart</h2>
+    <div id="cartItems"></div>
+    <h3 id="cartTotal">Total: ₹0</h3>
+
+    <button onclick="showSection('checkout')">Proceed to Checkout</button>
+</section>
+
+<!-- CHECKOUT -->
+<section id="checkout" class="card hidden">
+    <h2>Delivery Details</h2>
+
+    <input id="shippingName" placeholder="Receiver Name">
+    <input id="shippingPhone" type="tel" placeholder="Phone Number">
+    <textarea id="shippingAddress" placeholder="Full Shipping Address"></textarea>
+    <input id="shippingCity" placeholder="City">
+    <input id="shippingPincode" placeholder="PIN Code">
+
+    <label>Delivery Date</label>
+    <input id="deliveryDate" type="date">
+
+    <label>Payment Method</label>
+    <select id="paymentMethod">
+        <option value="COD">Cash on Delivery</option>
+        <option value="Demo Online Payment">Online Payment (Demo Only)</option>
+    </select>
+
+    <button onclick="placeOrder()">Place Order</button>
+</section>
+
+<!-- CUSTOMER ORDERS -->
+<section id="orders" class="card hidden">
+    <h2>My Orders & Shipping Status</h2>
+    <div id="myOrders"></div>
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<section id="adminDashboard" class="hidden">
+
+    <div class="dashboard-header">
+        <h2>Admin Dashboard</h2>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="card">
+        <h3>Add / Update Cake</h3>
+
+        <input type="hidden" id="cakeId">
+
+        <input id="cakeName" placeholder="Cake Name">
+        <input id="cakePrice" type="number" placeholder="Price">
+        <input id="cakeCategory" placeholder="Category">
+        <input id="cakeFlavor" placeholder="Flavour">
+        <input id="cakeStock" type="number" placeholder="Stock Quantity">
+        <input id="cakeImage" type="url" placeholder="Image URL">
+        <textarea id="cakeDescription" placeholder="Cake Description"></textarea>
+
+        <button onclick="saveCake()">Save Cake</button>
+    </div>
+
+    <div class="card">
+        <h3>Manage Products</h3>
+        <div id="adminCakes"></div>
+    </div>
+
+    <div class="card">
+        <h3>Manage Orders & Shipping</h3>
+        <div id="adminOrders"></div>
+    </div>
+
+    <div class="card">
+        <h3>Registered Customers</h3>
+        <div id="adminUsers"></div>
+    </div>
+
+</section>
+
+</div>
+
+<footer>
+    <p>© 2026 Sweet Cake Shop | Online Cake Ordering System</p>
+</footer>
+
+<script>
+
+// DEFAULT ADMIN
+const ADMIN_EMAIL = "admin@cakeshop.com";
+const ADMIN_PASSWORD = "admin123";
+
+// SAMPLE CAKES
+const defaultCakes = [
+    {
+        id: 1,
+        name: "Chocolate Cake",
+        price: 550,
+        category: "Chocolate",
+        flavor: "Chocolate",
+        stock: 10,
+        image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600",
+        description: "Rich chocolate cake with creamy frosting."
+    },
+    {
+        id: 2,
+        name: "Birthday Cake",
+        price: 750,
+        category: "Birthday",
+        flavor: "Vanilla",
+        stock: 8,
+        image: "https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=600",
+        description: "A colourful cake for birthday celebrations."
+    },
+    {
+        id: 3,
+        name: "Strawberry Cake",
+        price: 650,
+        category: "Fruit",
+        flavor: "Strawberry",
+        stock: 6,
+        image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600",
+        description: "Fresh strawberry flavoured cream cake."
+    },
+    {
+        id: 4,
+        name: "Red Velvet Cake",
+        price: 900,
+        category: "Anniversary",
+        flavor: "Red Velvet",
+        stock: 5,
+        image: "https://images.unsplash.com/photo-1586788680434-30d324b2d46f?w=600",
+        description: "Soft red velvet cake with cream frosting."
+    }
+];
+
+// LOAD DATA
+let cakes = JSON.parse(localStorage.getItem("cakes")) || defaultCakes;
+let users = JSON.parse(localStorage.getItem("cakeUsers")) || [];
+let orders = JSON.parse(localStorage.getItem("cakeOrders")) || [];
+let cart = [];
+
+let currentUser = null;
+let isAdmin = false;
+
+
+// SAVE DATA
+function saveData() {
+    localStorage.setItem("cakes", JSON.stringify(cakes));
+    localStorage.setItem("cakeUsers", JSON.stringify(users));
+    localStorage.setItem("cakeOrders", JSON.stringify(orders));
+}
+
+
+// SAFE TEXT
+function safe(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[c]);
+}
+
+
+// NAVIGATION
+function showSection(id) {
+
+    if (id === "checkout" && !currentUser) {
+        alert("Please login before checkout.");
+        id = "login";
+    }
+
+    if (id === "orders" && !currentUser) {
+        alert("Please login to view your orders.");
+        id = "login";
+    }
+
+    document.querySelectorAll(".container > section").forEach(
+        section => section.classList.add("hidden")
+    );
+
+    if (id === "shop" || id === "login" ||
+        id === "register" || id === "adminLogin" ||
+        id === "cart" || id === "checkout" || id === "orders") {
+        document.getElementById(id).classList.remove("hidden");
+    }
+
+    if (id === "shop") displayCakes();
+    if (id === "cart") displayCart();
+    if (id === "orders") displayMyOrders();
+}
+
+
+// REGISTER
+function register() {
+
+    let name = regName.value.trim();
+    let email = regEmail.value.trim().toLowerCase();
+    let password = regPassword.value;
+
+    if (!name || !email || !password) {
+        alert("Please fill all fields.");
+        return;
+    }
+
+    if (password.length < 6) {
+        alert("Password must have at least 6 characters.");
+        return;
+    }
+
+    if (users.some(u => u.email === email)) {
+        alert("Email already registered.");
+        return;
+    }
+
+    users.push({name, email, password});
+
+    saveData();
+
+    alert("Registration successful!");
+
+    regName.value = "";
+    regEmail.value = "";
+    regPassword.value = "";
+
+    showSection("login");
+}
+
+
+// CUSTOMER LOGIN
+function login() {
+
+    let email = loginEmail.value.trim().toLowerCase();
+    let password = loginPassword.value;
+
+    let user = users.find(
+        u => u.email === email && u.password === password
+    );
+
+    if (!user) {
+        alert("Invalid email or password.");
+        return;
+    }
+
+    currentUser = user;
+    isAdmin = false;
+
+    alert("Login successful!");
+
+    showSection("shop");
+}
+
+
+// ADMIN LOGIN
+function adminLogin() {
+
+    if (adminEmail.value.trim().toLowerCase() === ADMIN_EMAIL &&
+        adminPassword.value === ADMIN_PASSWORD) {
+
+        currentUser = {
+            name: "Administrator",
+            email: ADMIN_EMAIL
+        };
+
+        isAdmin = true;
+
+        document.querySelectorAll(".container > section").forEach(
+            section => section.classList.add("hidden")
+        );
+
+        adminDashboard.classList.remove("hidden");
+
+        displayAdminCakes();
+        displayAdminOrders();
+        displayAdminUsers();
+
+    } else {
+        alert("Invalid admin credentials.");
+    }
+}
+
+
+// LOGOUT
+function logout() {
+
+    currentUser = null;
+    isAdmin = false;
+
+    alert("Logged out.");
+
+    showSection("shop");
+}
+
+
+// DISPLAY CAKES AND FILTERS
+function displayCakes() {
+
+    let searchText = search.value.toLowerCase();
+    let selectedCategory = category.value;
+    let selectedFlavor = flavor.value;
+
+    let min = Number(minPrice.value || 0);
+    let max = Number(maxPrice.value || 5000);
+
+    let filtered = cakes.filter(cake =>
+        cake.name.toLowerCase().includes(searchText) &&
+        (!selectedCategory || cake.category === selectedCategory) &&
+        (!selectedFlavor || cake.flavor === selectedFlavor) &&
+        cake.price >= min &&
+        cake.price <= max
+    );
+
+    let html = "";
+
+    filtered.forEach(cake => {
+
+        html += `
+        <div class="cake">
+
+            <img src="${safe(cake.image)}"
+                 alt="${safe(cake.name)}"
+                 onerror="this.style.display='none'">
+
+            <h3>${safe(cake.name)}</h3>
+
+            <p>${safe(cake.description)}</p>
+
+            <p>Category: ${safe(cake.category)}</p>
+
+            <p>Flavour: ${safe(cake.flavor)}</p>
+
+            <p><b>₹${cake.price}</b></p>
+
+            <p>Stock: ${cake.stock}</p>
+
+            <button onclick="viewCake(${cake.id})">
+                View Details
+            </button>
+
+            <button onclick="addToCart(${cake.id})"
+                    ${cake.stock <= 0 ? "disabled" : ""}>
+                Add to Cart
+            </button>
+
+        </div>`;
+    });
+
+    cakeList.innerHTML = html || "<p>No cakes found.</p>";
+}
+
+
+// VIEW DETAILS
+function viewCake(id) {
+
+    let cake = cakes.find(c => c.id === id);
+
+    if (cake) {
+        alert(
+            "Cake: " + cake.name +
+            "\nDescription: " + cake.description +
+            "\nCategory: " + cake.category +
+            "\nFlavour: " + cake.flavor +
+            "\nPrice: ₹" + cake.price +
+            "\nAvailable stock: " + cake.stock
+        );
+    }
+}
+
+
+// ADD TO CART
+function addToCart(id) {
+
+    let cake = cakes.find(c => c.id === id);
+
+    if (!cake || cake.stock <= 0) {
+        alert("Cake is unavailable.");
+        return;
+    }
+
+    let item = cart.find(i => i.id === id);
+
+    if (item) {
+
+        if (item.quantity >= cake.stock) {
+            alert("Maximum available quantity reached.");
+            return;
+        }
+
+        item.quantity++;
+
+    } else {
+
+        cart.push({
+            id: cake.id,
+            quantity: 1,
+            size: "1 kg",
+            message: ""
+        });
+    }
+
+    updateCartCount();
+
+    alert("Cake added to cart!");
+}
+
+
+// CART COUNT
+function updateCartCount() {
+
+    cartCount.textContent = cart.reduce(
+        (sum, item) => sum + item.quantity, 0
+    );
+}
+
+
+// DISPLAY CART
+function displayCart() {
+
+    let html = "";
+    let total = 0;
+
+    cart.forEach(item => {
+
+        let cake = cakes.find(c => c.id === item.id);
+
+        if (!cake) return;
+
+        total += cake.price * item.quantity;
+
+        html += `
+        <div class="card">
+
+            <h3>${safe(cake.name)}</h3>
+
+            <p>Price: ₹${cake.price}</p>
+
+            <label>Size</label>
+
+            <select onchange="changeSize(${item.id}, this.value)">
+                <option ${item.size === "0.5 kg" ? "selected" : ""}>0.5 kg</option>
+                <option ${item.size === "1 kg" ? "selected" : ""}>1 kg</option>
+                <option ${item.size === "2 kg" ? "selected" : ""}>2 kg</option>
+            </select>
+
+            <label>Quantity</label>
+
+            <input type="number" min="1"
+                   max="${cake.stock}"
+                   value="${item.quantity}"
+                   onchange="changeQuantity(${item.id}, this.value)">
+
+            <label>Cake Message</label>
+
+            <input value="${safe(item.message)}"
+                   placeholder="Happy Birthday!"
+                   onchange="changeMessage(${item.id}, this.value)">
+
+            <button class="delete"
+                    onclick="removeFromCart(${item.id})">
+                Remove
+            </button>
+
+        </div>`;
+    });
+
+    cartItems.innerHTML = html || "<p>Your cart is empty.</p>";
+
+    cartTotal.textContent = "Total: ₹" + total;
+
+    updateCartCount();
+}
+
+
+// CART CUSTOMIZATION
+function changeSize(id, size) {
+
+    let item = cart.find(i => i.id === id);
+
+    if (item) item.size = size;
+
+    displayCart();
+}
+
+
+function changeQuantity(id, value) {
+
+    let item = cart.find(i => i.id === id);
+    let cake = cakes.find(c => c.id === id);
+
+    if (!item || !cake) return;
+
+    let quantity = Number(value);
+
+    if (!Number.isInteger(quantity) ||
+        quantity < 1 || quantity > cake.stock) {
+
+        alert("Enter a valid quantity within available stock.");
+        displayCart();
+        return;
+    }
+
+    item.quantity = quantity;
+
+    displayCart();
+}
+
+
+function changeMessage(id, message) {
+
+    let item = cart.find(i => i.id === id);
+
+    if (item) item.message = message;
+}
+
+
+function removeFromCart(id) {
+
+    cart = cart.filter(i => i.id !== id);
+
+    displayCart();
+}
+
+
+// PLACE ORDER
+function placeOrder() {
+
+    if (!currentUser || isAdmin) {
+        alert("Please login as a customer.");
+        return;
+    }
+
+    if (cart.length === 0) {
+        alert("Your cart is empty.");
+        return;
+    }
+
+    let name = shippingName.value.trim();
+    let phone = shippingPhone.value.trim();
+    let address = shippingAddress.value.trim();
+    let city = shippingCity.value.trim();
+    let pincode = shippingPincode.value.trim();
+    let date = deliveryDate.value;
+    let payment = paymentMethod.value;
+
+    if (!name || !phone || !address ||
+        !city || !pincode || !date) {
+
+        alert("Please complete all delivery details.");
+        return;
+    }
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+        alert("Enter a valid 10-digit phone number.");
+        return;
+    }
+
+    if (!/^[0-9]{6}$/.test(pincode)) {
+        alert("Enter a valid 6-digit PIN code.");
+        return;
+    }
+
+    let delivery = new Date(date + "T00:00:00");
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(delivery.getTime()) || delivery < today) {
+        alert("Choose today or a future delivery date.");
+        return;
+    }
+
+    // Verify all stock before creating the order
+    for (let item of cart) {
+
+        let cake = cakes.find(c => c.id === item.id);
+
+        if (!cake || cake.stock < item.quantity) {
+            alert("Insufficient stock for " +
+                  (cake ? cake.name : "a cake") + ".");
+            return;
+        }
+    }
+
+    let total = cart.reduce((sum, item) => {
+
+        let cake = cakes.find(c => c.id === item.id);
+
+        let sizeMultiplier = {
+            "0.5 kg": 0.5,
+            "1 kg": 1,
+            "2 kg": 2
+        }[item.size];
+
+        return sum + cake.price * sizeMultiplier * item.quantity;
+
+    }, 0);
+
+    let order = {
+
+        id: Date.now(),
+
+        email: currentUser.email,
+
+        customerName: name,
+
+        items: cart.map(item => {
+
+            let cake = cakes.find(c => c.id === item.id);
+
+            return {
+                name: cake.name,
+                price: cake.price,
+                quantity: item.quantity,
+                size: item.size,
+                message: item.message
+            };
+        }),
+
+        total: total,
+
+        address: address + ", " + city + ", " + pincode,
+
+        phone: phone,
+
+        deliveryDate: date,
+
+        payment: payment,
+
+        status: "Order Placed",
+
+        date: new Date().toLocaleDateString()
+
+    };
+
+    cart.forEach(item => {
+
+        let cake = cakes.find(c => c.id === item.id);
+
+        cake.stock -= item.quantity;
+    });
+
+    orders.push(order);
+
+    saveData();
+
+    cart = [];
+
+    updateCartCount();
+
+    alert("Order placed successfully! Order ID: " + order.id);
+
+    showSection("orders");
+}
+
+
+// CUSTOMER ORDERS
+function displayMyOrders() {
+
+    if (!currentUser || isAdmin) {
+        myOrders.innerHTML = "Please login as a customer.";
+        return;
+    }
+
+    let myList = orders.filter(
+        order => order.email === currentUser.email
+    );
+
+    if (myList.length === 0) {
+        myOrders.innerHTML = "<p>No orders yet.</p>";
+        return;
+    }
+
+    let html = "";
+
+    myList.forEach(order => {
+
+        html += `
+        <div class="card">
+
+            <h3>Order #${order.id}</h3>
+
+            <p>Date: ${safe(order.date)}</p>
+
+            <p>Total: ₹${order.total}</p>
+
+            <p>Items: ${order.items.map(i =>
+                safe(i.name) + " (" + safe(i.size) +
+                ") × " + i.quantity
+            ).join(", ")}</p>
+
+            <p>Shipping Address: ${safe(order.address)}</p>
+
+            <p>Expected Delivery: ${safe(order.deliveryDate)}</p>
+
+            <p>Payment: ${safe(order.payment)}</p>
+
+            <p><b>Shipping Status: ${safe(order.status)}</b></p>
+
+        </div>`;
+    });
+
+    myOrders.innerHTML = html;
+}
+
+
+// ADMIN SAVE CAKE
+function saveCake() {
+
+    if (!isAdmin) {
+        alert("Admin access required.");
+        return;
+    }
+
+    let id = cakeId.value;
+    let name = cakeName.value.trim();
+    let price = Number(cakePrice.value);
+    let cat = cakeCategory.value.trim();
+    let flav = cakeFlavor.value.trim();
+    let stock = Number(cakeStock.value);
+    let image = cakeImage.value.trim();
+    let description = cakeDescription.value.trim();
+
+    if (!name || !cat || !flav || !description ||
+        cakePrice.value === "" || price <= 0 ||
+        cakeStock.value === "" ||
+        !Number.isInteger(stock) || stock < 0) {
+
+        alert("Enter valid cake details.");
+        return;
+    }
+
+    if (image) {
+        try {
+            let url = new URL(image);
+
+            if (!["http:", "https:"].includes(url.protocol)) {
+                throw new Error("Invalid image URL");
+            }
+        } catch {
+            alert("Enter a valid image URL.");
+            return;
+        }
+    }
+
+    if (id) {
+
+        let cake = cakes.find(c => c.id === Number(id));
+
+        if (cake) {
+            cake.name = name;
+            cake.price = price;
+            cake.category = cat;
+            cake.flavor = flav;
+            cake.stock = stock;
+            cake.image = image;
+            cake.description = description;
+        }
+
+        alert("Cake updated successfully!");
+
+    } else {
+
+        cakes.push({
+            id: Date.now(),
+            name,
+            price,
+            category: cat,
+            flavor: flav,
+            stock,
+            image,
+            description
+        });
+
+        alert("Cake added successfully!");
+    }
+
+    saveData();
+
+    cakeId.value = "";
+    cakeName.value = "";
+    cakePrice.value = "";
+    cakeCategory.value = "";
+    cakeFlavor.value = "";
+    cakeStock.value = "";
+    cakeImage.value = "";
+    cakeDescription.value = "";
+
+    displayAdminCakes();
+    displayCakes();
+}
+
+
+// ADMIN PRODUCT LIST
+function displayAdminCakes() {
+
+    let html = `
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Cake</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Action</th>
+        </tr>`;
+
+    cakes.forEach(cake => {
+
+        html += `
+        <tr>
+            <td>${cake.id}</td>
+            <td>${safe(cake.name)}</td>
+            <td>₹${cake.price}</td>
+            <td>${cake.stock}</td>
+            <td>
+                <button onclick="editCake(${cake.id})">Edit</button>
+                <button class="delete"
+                        onclick="deleteCake(${cake.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+
+    html += "</table>";
+
+    adminCakes.innerHTML = html;
+}
+
+
+// EDIT CAKE
+function editCake(id) {
+
+    let cake = cakes.find(c => c.id === id);
+
+    if (!cake) return;
+
+    cakeId.value = cake.id;
+    cakeName.value = cake.name;
+    cakePrice.value = cake.price;
+    cakeCategory.value = cake.category;
+    cakeFlavor.value = cake.flavor;
+    cakeStock.value = cake.stock;
+    cakeImage.value = cake.image;
+    cakeDescription.value = cake.description;
+
+    window.scrollTo(0, 0);
+}
+
+
+// DELETE CAKE
+function deleteCake(id) {
+
+    let hasOrder = orders.some(order =>
+        order.items.some(item =>
+            item.name === cakes.find(c => c.id === id)?.name
+        )
+    );
+
+    if (hasOrder) {
+        alert("This cake appears in order history and cannot be deleted.");
+        return;
+    }
+
+    if (confirm("Delete this cake?")) {
+
+        cakes = cakes.filter(c => c.id !== id);
+
+        saveData();
+
+        displayAdminCakes();
+        displayCakes();
+    }
+}
+
+
+// ADMIN ORDERS
+function displayAdminOrders() {
+
+    let html = `
+    <table>
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th>Update</th>
+        </tr>`;
+
+    orders.forEach(order => {
+
+        html += `
+        <tr>
+            <td>${order.id}</td>
+            <td>${safe(order.customerName)}<br>${safe(order.email)}</td>
+            <td>₹${order.total}</td>
+            <td>${safe(order.address)}</td>
+            <td>${safe(order.status)}</td>
+            <td>
+                <select id="status${order.id}">
+                    <option>Order Placed</option>
+                    <option>Preparing</option>
+                    <option>Shipped</option>
+                    <option>Out for Delivery</option>
+                    <option>Delivered</option>
+                    <option>Cancelled</option>
+                </select>
+
+                <button onclick="updateStatus(${order.id})">
+                    Update
+                </button>
+            </td>
+        </tr>`;
+    });
+
+    html += "</table>";
+
+    adminOrders.innerHTML = html;
+}
+
+
+// UPDATE SHIPPING STATUS
+function updateStatus(id) {
+
+    if (!isAdmin) return;
+
+    let order = orders.find(o => o.id === id);
+
+    let status = document.getElementById("status" + id).value;
+
+    if (!order) return;
+
+    if (order.status === "Cancelled" ||
+        order.status === "Delivered") {
+
+        alert("This order has already been finalized.");
+        return;
+    }
+
+    if (status === "Cancelled") {
+
+        if (!confirm("Cancel this order and restore stock?")) {
+            return;
+        }
+
+        order.items.forEach(item => {
+
+            let cake = cakes.find(c => c.name === item.name);
+
+            if (cake) cake.stock += item.quantity;
+        });
+    }
+
+    order.status = status;
+
+    saveData();
+
+    displayAdminOrders();
+    displayAdminCakes();
+    displayCakes();
+
+    alert("Order status updated!");
+}
+
+
+// ADMIN USERS
+function displayAdminUsers() {
+
+    let html = `
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>`;
+
+    users.forEach(user => {
+
+        html += `
+        <tr>
+            <td>${safe(user.name)}</td>
+            <td>${safe(user.email)}</td>
+        </tr>`;
+    });
+
+    html += "</table>";
+
+    adminUsers.innerHTML = html;
+}
+
+
+// INITIALIZE
+saveData();
+displayCakes();
+updateCartCount();
+
+</script>
+
+</body>
+</html>

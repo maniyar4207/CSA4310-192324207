@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EasyToll</title>
+<style>
+body{font-family:Arial;margin:0;background:#f2f7fc;color:#333}
+header{background:#145da0;color:white;text-align:center;padding:20px}
+nav{text-align:center;background:#dceafa;padding:12px}
+nav a{margin:10px;color:#145da0;text-decoration:none;font-weight:bold}
+main{padding:20px}
+section{background:white;padding:16px;margin:18px 0;border-radius:8px}
+input,select,button{padding:9px;margin:5px;border:1px solid #ccc;border-radius:5px}
+button{background:#145da0;color:white;cursor:pointer}
+.card{background:#edf5ff;padding:12px;margin:10px 0;border-radius:6px}
+</style>
+</head>
+<body>
+<header>
+<h1>🚘 EasyToll</h1>
+<p>Pay in Advance • Travel Without Queues</p>
+</header>
+<nav>
+<a href="#account">Account</a><a href="#user">User</a>
+<a href="#admin">Admin</a><a href="#gate">Toll Gate</a>
+</nav>
+<main>
+
+<section id="account">
+<h2>Register / Login</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Register / Login</button>
+<button onclick="logout()">Logout</button>
+<p id="message">Please log in.</p>
+</section>
+
+<section id="user">
+<h2>User Wallet</h2>
+<p>Wallet Balance: ₹<span id="balance">0</span></p>
+<input id="amount" type="number" placeholder="Amount to add">
+<button onclick="addMoney()">Add Money</button>
+
+<h3>Buy Toll e-Ticket</h3>
+<input id="route" placeholder="Route / Toll location">
+<input id="fare" type="number" placeholder="Toll fee">
+<button onclick="buyTicket()">Buy e-Ticket</button>
+
+<h3>Apply / Renew Toll Pass</h3>
+<select id="passType"><option>Monthly Pass</option><option>Annual Pass</option></select>
+<button onclick="applyPass()">Apply / Renew Pass</button>
+<div id="userTickets"></div>
+</section>
+
+<section id="admin">
+<h2>Admin Login</h2>
+<input id="adminPassword" type="password" placeholder="Admin password">
+<button onclick="adminLogin()">Admin Login</button>
+<p id="adminMsg"></p>
+<h3>Manage Toll Details</h3>
+<input id="tollName" placeholder="Toll gate name">
+<input id="tollFee" type="number" placeholder="Toll fee">
+<button onclick="createToll()">Add Toll</button>
+<div id="tollList"></div>
+<h3>Approve Passes</h3>
+<div id="passList"></div>
+</section>
+
+<section id="gate">
+<h2>Toll Gate Login / QR Verification</h2>
+<input id="gatePassword" type="password" placeholder="Gate password">
+<button onclick="gateLogin()">Login</button>
+<input id="ticketId" placeholder="Enter ticket / pass ID">
+<input id="gateLocation" placeholder="Current toll location">
+<button onclick="verifyTicket()">Verify QR / Ticket / Pass</button>
+<p id="verifyMsg"></p>
+</section>
+
+<section>
+<h2>Transaction History</h2>
+<div id="history"></div>
+</section>
+</main>
+
+<script>
+let user="",balance=0,isAdmin=false,isGate=false;
+let tickets=[],passes=[],tolls=[],history=[];
+
+function login(){
+let u=document.getElementById("username").value.trim();
+let p=document.getElementById("password").value;
+if(!u||!p)return alert("Enter username and password.");
+user=u;
+document.getElementById("message").innerText="Logged in as "+user;
+}
+function logout(){user="";isAdmin=false;isGate=false;document.getElementById("message").innerText="Logged out.";}
+function addMoney(){
+if(!user)return alert("Please login first.");
+let a=Number(document.getElementById("amount").value);
+if(a<=0)return alert("Enter a valid amount.");
+balance+=a;updateBalance();
+history.push("Wallet recharge: ₹"+a);showHistory();
+}
+function updateBalance(){document.getElementById("balance").innerText=balance;}
+function buyTicket(){
+if(!user)return alert("Please login first.");
+let route=document.getElementById("route").value.trim();
+let fee=Number(document.getElementById("fare").value);
+if(!route||fee<=0)return alert("Enter valid route and fee.");
+if(balance<fee)return alert("Insufficient wallet balance.");
+balance-=fee;updateBalance();
+let t={id:"ET"+Date.now(),user,route,fee,status:"Valid"};
+tickets.push(t);history.push("Ticket "+t.id+" purchased: ₹"+fee);
+showTickets();showHistory();
+}
+function applyPass(){
+if(!user)return alert("Please login first.");
+let p={id:"PASS"+Date.now(),user,
+type:document.getElementById("passType").value,status:"Pending"};
+passes.push(p);showPasses();showTickets();
+}
+function adminLogin(){
+if(document.getElementById("adminPassword").value==="admin123"){
+isAdmin=true;document.getElementById("adminMsg").innerText="Admin login successful.";
+showPasses();showTolls();
+}else alert("Incorrect password. Demo password: admin123");
+}
+function createToll(){
+if(!isAdmin)return alert("Admin login required.");
+let name=document.getElementById("tollName").value.trim();
+let fee=Number(document.getElementById("tollFee").value);
+if(!name||fee<=0)return alert("Enter valid toll details.");
+tolls.push({name,fee});showTolls();
+}
+function showTolls(){
+document.getElementById("tollList").innerHTML=tolls.map(t=>
+`<div class="card">${t.name} - ₹${t.fee}</div>`).join("");
+}
+function showPasses(){
+document.getElementById("passList").innerHTML=passes.map(p=>
+`<div class="card">${p.id} | ${p.user} | ${p.type} | ${p.status}
+${isAdmin&&p.status==="Pending"?`<button onclick="approvePass('${p.id}')">Approve</button>`:""}
+</div>`).join("");
+}
+function approvePass(id){
+let p=passes.find(p=>p.id===id);p.status="Approved";showPasses();showTickets();
+}
+function showTickets(){
+document.getElementById("userTickets").innerHTML=
+tickets.filter(t=>t.user===user).map(t=>
+`<div class="card">Ticket ID: ${t.id}<br>Route: ${t.route}<br>
+Fee: ₹${t.fee}<br>Status: ${t.status}<br>
+QR Code: <b>${t.id}</b></div>`).join("")+
+passes.filter(p=>p.user===user).map(p=>
+`<div class="card">Pass ID: ${p.id} | ${p.type} | ${p.status}
+${p.status==="Approved"?`<br>QR Code ID: ${p.id}`:""}</div>`).join("");
+}
+function gateLogin(){
+if(document.getElementById("gatePassword").value==="gate123"){
+isGate=true;alert("Toll gate login successful.");
+}else alert("Demo gate password: gate123");
+}
+function verifyTicket(){
+if(!isGate)return alert("Toll gate login required.");
+let id=document.getElementById("ticketId").value.trim();
+let loc=document.getElementById("gateLocation").value.trim();
+let t=tickets.find(t=>t.id===id&&t.status==="Valid");
+let p=passes.find(p=>p.id===id&&p.status==="Approved");
+document.getElementById("verifyMsg").innerText=
+t?"Valid toll ticket for "+t.user+" at "+loc:
+p?"Approved toll pass for "+p.user+" at "+loc:
+"Ticket or approved pass not found.";
+if(t||p)history.push("Verified "+id+" at "+loc);
+showHistory();
+}
+function showHistory(){
+document.getElementById("history").innerHTML=history.map(x=>"<p>"+x+"</p>").join("");
+}
+</script>
+</body>
+</html>

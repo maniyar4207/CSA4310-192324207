@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AJAX Example</title>
+</head>
+<body>
+  <h2>AJAX Demo</h2>
+  <button onclick="loadData()">Load Data</button>
+  <div id="result"></div>
+
+  <script>
+    function loadData() {
+      var xhr = new XMLHttpRequest();
+
+      xhr.open("GET", "https://jsonplaceholder.typicode.com/todos/2", true);
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var response = JSON.parse(xhr.responseText);
+          document.getElementById("result").innerHTML =
+            "User ID: " + response.userId + "<br>" +
+            "ID: " + response.id + "<br>" +
+            "Title: " + response.title + "<br>" +
+            "Completed: " + response.completed;
+        }
+        else if(xhr.status === 404){
+            document.getElementById("result").innerHTML = "Page not found";
+        }
+      };
+
+      xhr.send();
+    }
+  </script>
+</body>
+</html>

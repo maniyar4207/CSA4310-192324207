@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library Management System</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 850px;
+    margin: auto;
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+}
+h1, h2 { color: #164e63; }
+input, select, button {
+    padding: 10px;
+    margin: 5px 3px;
+}
+button {
+    background: #087e8b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.book {
+    border: 1px solid #ddd;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Library Management System</h1>
+
+<h2>Login</h2>
+<input id="username" placeholder="Enter username">
+<select id="role">
+    <option value="student">Student</option>
+    <option value="admin">Librarian Admin</option>
+</select>
+<button onclick="login()">Login</button>
+<p id="message">Please log in to continue.</p>
+
+<hr>
+<h2>Search Books</h2>
+<input id="search" placeholder="Search by title or author"
+       oninput="displayBooks()">
+<div id="bookList"></div>
+
+<div id="adminPanel" hidden>
+<hr>
+<h2>Admin: Add Book</h2>
+<input id="title" placeholder="Book title">
+<input id="author" placeholder="Author">
+<button onclick="addBook()">Add Book</button>
+</div>
+
+<hr>
+<h2>My Borrow History</h2>
+<div id="history">Log in to view your borrowing history.</div>
+
+<h2>Study Materials</h2>
+<select id="year">
+    <option value="1">Year 1</option>
+    <option value="2">Year 2</option>
+    <option value="3">Year 3</option>
+    <option value="4">Year 4</option>
+</select>
+<select id="semester">
+    <option value="1">Semester 1</option>
+    <option value="2">Semester 2</option>
+</select>
+<button onclick="searchMaterial()">Search Material</button>
+<div id="materials"></div>
+
+<h2>Contact Librarian</h2>
+<input id="contact" placeholder="Enter your message">
+<button onclick="sendMessage()">Send</button>
+<p id="contactMessage"></p>
+</div>
+
+<script>
+let books = [
+    {id: 1, title: "Web Development",
+     author: "Jon Duckett", available: true},
+    {id: 2, title: "Python Programming",
+     author: "Mark Lutz", available: true},
+    {id: 3, title: "Database Systems",
+     author: "Raghu Ramakrishnan", available: true}
+];
+
+let history = [];
+let currentUser = "";
+let currentRole = "student";
+
+function login() {
+    currentUser = document.getElementById("username").value.trim();
+    currentRole = document.getElementById("role").value;
+
+    if (!currentUser) {
+        alert("Please enter a username.");
+        return;
+    }
+
+    document.getElementById("message").textContent =
+        "Welcome, " + currentUser + " (" + currentRole + ")";
+
+    document.getElementById("adminPanel").hidden =
+        currentRole !== "admin";
+
+    displayBooks();
+    displayHistory();
+}
+
+function displayBooks() {
+    let query = document.getElementById("search").value.toLowerCase();
+
+    document.getElementById("bookList").innerHTML = books
+        .filter(b => (b.title + " " + b.author)
+        .toLowerCase().includes(query))
+        .map(b => `
+          <div class="book">
+            <b>${b.title}</b> — ${b.author}<br>
+            Status: ${b.available ? "Available" : "Issued"}<br>
+            <button onclick="borrowBook(${b.id})"
+              ${!currentUser || !b.available ||
+                currentRole !== "student" ? "disabled" : ""}>
+              Issue Book
+            </button>
+            ${currentRole === "admin" ? `
+              <button onclick="returnBook(${b.id})">Return</button>
+              <button onclick="deleteBook(${b.id})">Delete</button>
+            ` : ""}
+          </div>
+        `).join("") || "No books found.";
+}
+
+function addBook() {
+    let title = document.getElementById("title").value.trim();
+    let author = document.getElementById("author").value.trim();
+
+    if (!title || !author) {
+        alert("Enter both title and author.");
+        return;
+    }
+
+    books.push({
+        id: Date.now(), title, author, available: true
+    });
+
+    document.getElementById("title").value = "";
+    document.getElementById("author").value = "";
+    displayBooks();
+}
+
+function borrowBook(id) {
+    let book = books.find(b => b.id === id);
+
+    if (!currentUser || !book || !book.available) return;
+
+    let issueDate = new Date();
+    let expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 14);
+
+    book.available = false;
+
+    history.push({
+        user: currentUser,
+        book: book.title,
+        issue: issueDate.toLocaleDateString(),
+        expiry: expiryDate.toLocaleDateString(),
+        due: expiryDate,
+        returned: false
+    });
+
+    displayBooks();
+    displayHistory();
+}
+
+function returnBook(id) {
+    let book = books.find(b => b.id === id);
+    if (!book) return;
+
+    let record = history.find(h =>
+        h.book === book.title && !h.returned
+    );
+
+    if (!record) {
+        alert("No active issue record found.");
+        return;
+    }
+
+    record.returned = true;
+    book.available = true;
+
+    let lateDays = Math.max(
+        0, Math.ceil((new Date() - record.due) / 86400000)
+    );
+    let fine = lateDays * 2;
+
+    alert("Book returned. Fine: ₹" + fine);
+    displayBooks();
+    displayHistory();
+}
+
+function deleteBook(id) {
+    books = books.filter(b => b.id !== id);
+    displayBooks();
+}
+
+function displayHistory() {
+    let records = history.filter(h => h.user === currentUser);
+
+    document.getElementById("history").innerHTML =
+        records.map(h => `
+          <div class="book">
+            ${h.book}<br>
+            Issue Date: ${h.issue}<br>
+            Expected Return: ${h.expiry}<br>
+            Status: ${h.returned ? "Returned" : "Borrowed"}
+          </div>
+        `).join("") || "No borrowing history.";
+}
+
+function searchMaterial() {
+    let year = document.getElementById("year").value;
+    let sem = document.getElementById("semester").value;
+
+    let material = {
+        1: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        2: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+    };
+
+    document.getElementById("materials").innerHTML =
+        `<p>Year ${year}, Semester ${sem} material</p>
+         <a href="${material[sem]}" download>Download Sample PDF</a>`;
+}
+
+function sendMessage() {
+    let msg = document.getElementById("contact").value.trim();
+
+    document.getElementById("contactMessage").textContent =
+        msg ? "Message recorded in this demo." :
+              "Please enter a message.";
+}
+</script>
+</body>
+</html>

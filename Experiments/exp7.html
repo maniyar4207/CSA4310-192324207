@@ -1,0 +1,1017 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glow Beauty Parlour | Appointment Booking</title>
+
+<style>
+:root {
+  --pink: #d94f87;
+  --dark: #30202a;
+  --light: #fff4f8;
+  --white: #ffffff;
+  --muted: #766975;
+  --green: #21865b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Arial, sans-serif;
+  color: var(--dark);
+  background: #fffafb;
+  line-height: 1.6;
+}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+header {
+  background: white;
+  padding: 15px 6%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 12px #0000000b;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.logo { font-size: 25px; font-weight: bold; color: var(--pink); }
+nav { display: flex; gap: 15px; flex-wrap: wrap; }
+nav button {
+  border: 0; background: transparent; color: var(--dark);
+  padding: 8px; font-weight: bold;
+}
+nav button:hover { color: var(--pink); }
+.container { max-width: 1150px; margin: auto; padding: 35px 20px; }
+.hero {
+  background: linear-gradient(120deg,#fce0ec,#fff4e8);
+  padding: 65px 8%;
+  text-align: center;
+}
+.hero h1 { font-size: clamp(30px,5vw,48px); line-height: 1.2; }
+.hero p { margin: 15px 0 22px; color: #68515f; }
+.btn {
+  background: var(--pink); color: white; border: 0;
+  border-radius: 7px; padding: 11px 17px;
+  font-weight: bold; display: inline-block;
+}
+.btn:hover { opacity: .87; }
+.btn.secondary { background: #59404f; }
+.btn.danger { background: #c63d49; }
+.btn.green { background: var(--green); }
+.btn.small { padding: 6px 10px; font-size: 13px; }
+.section-title { margin-bottom: 20px; font-size: 27px; }
+.grid {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 20px;
+}
+.card {
+  background: white; border: 1px solid #f0dfe7;
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 4px 16px #54213b08;
+}
+.card-body { padding: 18px; }
+.card h3 { margin-bottom: 5px; }
+.card p { color: var(--muted); margin: 6px 0; }
+.emoji {
+  background: var(--light); font-size: 55px; text-align: center;
+  padding: 22px;
+}
+.price { color: var(--pink); font-weight: bold; font-size: 19px; }
+.badge {
+  display: inline-block; border-radius: 20px; padding: 3px 10px;
+  font-size: 12px; background: #f9e7ef; color: #9e3263;
+}
+form { display: grid; gap: 13px; }
+label { font-weight: bold; font-size: 14px; }
+input, select, textarea {
+  width: 100%; padding: 11px; border: 1px solid #dfcfd8;
+  border-radius: 7px; background: white; color: var(--dark);
+}
+textarea { min-height: 90px; resize: vertical; }
+.field { display: grid; gap: 5px; }
+.booking-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 25px;
+}
+.panel {
+  background: white; border: 1px solid #f0dfe7;
+  padding: 22px; border-radius: 12px; margin-bottom: 20px;
+}
+.notice {
+  background: #fff0f5; padding: 12px; border-radius: 8px;
+  font-size: 14px; margin: 12px 0;
+}
+.hidden { display: none !important; }
+table { width: 100%; border-collapse: collapse; min-width: 650px; }
+th, td { padding: 11px; border-bottom: 1px solid #eee; text-align: left; }
+th { background: #fff0f5; }
+.table-wrap { overflow-x: auto; }
+.calendar {
+  display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px;
+}
+.day {
+  min-height: 65px; background: white; border: 1px solid #ecdce4;
+  border-radius: 6px; padding: 6px; font-size: 13px;
+}
+.day.today { border: 2px solid var(--pink); }
+.day.booked { background: #ffe8ed; }
+.day.empty { background: transparent; border: 0; }
+.calendar-heading { text-align: center; font-weight: bold; padding: 8px 0; }
+.footer {
+  background: #30202a; color: white; text-align: center; padding: 25px;
+}
+.muted { color: var(--muted); font-size: 14px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+hr { border: 0; border-top: 1px solid #eee; margin: 16px 0; }
+#message { margin: 12px 0; font-weight: bold; color: var(--green); }
+@media(max-width:800px) {
+  .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .booking-layout { grid-template-columns: 1fr; }
+}
+@media(max-width:520px) {
+  header { position: static; }
+  nav { gap: 5px; }
+  nav button { font-size: 13px; padding: 5px; }
+  .grid { grid-template-columns: 1fr; }
+  .hero { padding: 45px 6%; }
+  .container { padding: 25px 14px; }
+  .panel { padding: 15px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">✿ Glow Beauty</div>
+  <nav>
+    <button onclick="showPage('home')">Home</button>
+    <button onclick="showPage('services')">Services</button>
+    <button onclick="showPage('booking')">Book Appointment</button>
+    <button onclick="showPage('dashboard')">My Account</button>
+    <button onclick="showPage('manager')">Manager</button>
+    <button onclick="showPage('feedback')">Feedback</button>
+    <button onclick="showPage('account')">Login / Register</button>
+  </nav>
+</header>
+
+<div id="message" role="status" aria-live="polite"></div>
+
+<!-- HOME -->
+<section id="home" class="page">
+  <div class="hero">
+    <h1>Your Beauty, Your Time ✨</h1>
+    <p>Discover beauty services, choose your favourite stylist, and book an appointment online.</p>
+    <button class="btn" onclick="showPage('booking')">Book Your Appointment</button>
+  </div>
+
+  <div class="container">
+    <h2 class="section-title">Why Choose Glow Beauty?</h2>
+    <div class="grid">
+      <div class="card"><div class="emoji">💇‍♀️</div><div class="card-body">
+        <h3>Expert Stylists</h3><p>Explore stylist profiles and select your preferred professional.</p>
+      </div></div>
+      <div class="card"><div class="emoji">📅</div><div class="card-body">
+        <h3>Easy Booking</h3><p>View available appointment times and manage reservations.</p>
+      </div></div>
+      <div class="card"><div class="emoji">💳</div><div class="card-body">
+        <h3>Flexible Payments</h3><p>Choose a full payment or a deposit in this demonstration.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES AND SALON SEARCH -->
+<section id="services" class="page hidden">
+  <div class="container">
+    <h2 class="section-title">Find Your Beauty Service</h2>
+    <div class="field" style="margin-bottom:20px">
+      <label for="search">Search services or parlour name</label>
+      <input id="search" placeholder="Search haircut, facial, Glow Beauty..." oninput="renderServices()">
+    </div>
+    <div id="serviceList" class="grid"></div>
+
+    <h2 class="section-title" style="margin-top:35px">Our Stylists</h2>
+    <div id="stylistList" class="grid"></div>
+    <p class="muted" style="margin-top:15px">
+      This sample contains one salon. Searching other salons requires a connected salon directory or database.
+    </p>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking" class="page hidden">
+  <div class="container">
+    <h2 class="section-title">Book an Appointment</h2>
+    <div class="booking-layout">
+      <div class="panel">
+        <h3>Appointment Details</h3>
+        <p class="muted">Choose a service, stylist, date, and available time.</p>
+        <form id="bookingForm">
+          <div class="field">
+            <label for="customer">Your Name</label>
+            <input id="customer" required placeholder="Enter your name">
+          </div>
+          <div class="field">
+            <label for="customerEmail">Email</label>
+            <input id="customerEmail" type="email" required placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label for="customerPhone">Phone Number</label>
+            <input id="customerPhone" type="tel" required placeholder="Enter phone number">
+          </div>
+          <div class="field">
+            <label for="salon">Beauty Parlour</label>
+            <select id="salon"><option value="Glow Beauty">Glow Beauty</option></select>
+          </div>
+          <div class="field">
+            <label for="service">Select Service</label>
+            <select id="service" required onchange="updateBookingSummary()"></select>
+          </div>
+          <div class="field">
+            <label for="stylist">Select Stylist</label>
+            <select id="stylist" required></select>
+          </div>
+          <div class="field">
+            <label for="date">Appointment Date</label>
+            <input type="date" id="date" required onchange="updateSlots()">
+          </div>
+          <div class="field">
+            <label for="time">Available Time</label>
+            <select id="time" required></select>
+          </div>
+          <div class="field">
+            <label for="paymentType">Payment Option</label>
+            <select id="paymentType" onchange="updateBookingSummary()">
+              <option value="full">Full Payment</option>
+              <option value="deposit">30% Deposit</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="paymentMethod">Payment Method</label>
+            <select id="paymentMethod">
+              <option value="Stripe">Stripe (demo)</option>
+              <option value="PayPal">PayPal (demo)</option>
+              <option value="Pay at Salon">Pay at Salon</option>
+            </select>
+          </div>
+          <div class="notice" id="bookingSummary">Choose a service to see the amount.</div>
+          <button class="btn" type="submit">Confirm Appointment</button>
+        </form>
+        <p class="muted" style="margin-top:12px">
+          Demo only: no real payment is collected. Do not enter card details.
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <h3>Reservations Calendar</h3>
+          <input id="calendarMonth" type="month" style="width:auto" onchange="renderCalendar()">
+        </div>
+        <p class="muted">Pink dates indicate dates with existing reservations.</p>
+        <div id="calendar" class="calendar" style="margin-top:15px"></div>
+        <hr>
+        <h3>Salon Opening Hours</h3>
+        <p>Monday–Saturday: 9:00 AM – 6:00 PM</p>
+        <p>Sunday: Closed</p>
+        <p class="muted">Appointments are shown in this browser only. A shared real-time calendar requires a backend.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CUSTOMER DASHBOARD -->
+<section id="dashboard" class="page hidden">
+  <div class="container">
+    <h2 class="section-title">My Account Dashboard</h2>
+    <div class="panel">
+      <h3>Personal Information</h3>
+      <p id="profileInfo">Log in or register to manage your account.</p>
+      <button class="btn small" onclick="showPage('account')">Login / Register</button>
+    </div>
+    <div class="panel">
+      <h3>Upcoming Reservations</h3>
+      <div id="upcoming"></div>
+    </div>
+    <div class="panel">
+      <h3>Reservation History</h3>
+      <div id="history"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MANAGER PANEL -->
+<section id="manager" class="page hidden">
+  <div class="container">
+    <h2 class="section-title">Salon Manager Panel</h2>
+    <div class="notice">
+      Academic demonstration: this panel has no manager authentication. A real system must restrict it to authorised staff.
+    </div>
+    <div class="panel">
+      <h3>Reservations Calendar</h3>
+      <div class="field">
+        <label for="managerDate">View reservations for date</label>
+        <input type="date" id="managerDate" onchange="renderManager()">
+      </div>
+      <div id="managerCalendar" style="margin-top:15px"></div>
+    </div>
+    <div class="panel">
+      <h3>Manage All Reservations</h3>
+      <div id="allReservations" class="table-wrap"></div>
+    </div>
+    <div class="panel">
+      <h3>Lock Unavailable Hours</h3>
+      <form id="blockForm">
+        <div class="field"><label for="blockDate">Date</label><input type="date" id="blockDate" required></div>
+        <div class="field"><label for="blockTime">Time Slot</label><select id="blockTime"></select></div>
+        <button class="btn" type="submit">Block Time Slot</button>
+      </form>
+      <div id="blockedList" style="margin-top:15px"></div>
+    </div>
+    <div class="panel">
+      <h3>Manage Services</h3>
+      <form id="serviceForm">
+        <div class="field"><label for="newService">Service Name</label><input id="newService" required></div>
+        <div class="field"><label for="newPrice">Price (₹)</label><input id="newPrice" type="number" min="1" required></div>
+        <div class="field"><label for="newDuration">Duration (minutes)</label><input id="newDuration" type="number" min="15" step="15" value="30" required></div>
+        <button class="btn" type="submit">Add Service</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h3>Manage Stylists</h3>
+      <form id="stylistForm">
+        <div class="field"><label for="newStylist">Stylist Name</label><input id="newStylist" required></div>
+        <div class="field"><label for="newSpecialty">Speciality</label><input id="newSpecialty" required></div>
+        <button class="btn" type="submit">Add Stylist</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h3>Customer Accounts</h3>
+      <div id="customerAccounts"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEEDBACK -->
+<section id="feedback" class="page hidden">
+  <div class="container">
+    <h2 class="section-title">Customer Feedback</h2>
+    <div class="booking-layout">
+      <div class="panel">
+        <h3>Share Your Experience</h3>
+        <form id="feedbackForm">
+          <div class="field"><label for="reviewName">Your Name</label><input id="reviewName" required></div>
+          <div class="field"><label for="rating">Rating</label>
+            <select id="rating"><option value="5">★★★★★ - Excellent</option><option value="4">★★★★ - Very good</option><option value="3">★★★ - Good</option><option value="2">★★ - Fair</option><option value="1">★ - Poor</option></select>
+          </div>
+          <div class="field"><label for="reviewText">Comments</label><textarea id="reviewText" required placeholder="Tell us about your experience"></textarea></div>
+          <button class="btn" type="submit">Submit Feedback</button>
+        </form>
+      </div>
+      <div class="panel">
+        <h3>Customer Reviews</h3>
+        <div id="reviews"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGIN / REGISTER -->
+<section id="account" class="page hidden">
+  <div class="container">
+    <h2 class="section-title">Customer Account</h2>
+    <div class="booking-layout">
+      <div class="panel">
+        <h3>Register</h3>
+        <form id="registerForm">
+          <div class="field"><label for="regName">Full Name</label><input id="regName" required></div>
+          <div class="field"><label for="regEmail">Email</label><input id="regEmail" type="email" required></div>
+          <div class="field"><label for="regPhone">Phone</label><input id="regPhone" type="tel" required></div>
+          <div class="field"><label for="regPassword">Password</label><input id="regPassword" type="password" minlength="6" required></div>
+          <button class="btn" type="submit">Create Account</button>
+        </form>
+      </div>
+      <div class="panel">
+        <h3>Login</h3>
+        <form id="loginForm">
+          <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" required></div>
+          <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" required></div>
+          <button class="btn" type="submit">Login</button>
+          <button class="btn secondary" type="button" onclick="logout()">Logout</button>
+        </form>
+        <p class="muted" style="margin-top:12px">Demo accounts are stored locally in your browser. This is not production-safe authentication.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>✿ Glow Beauty Parlour</p>
+  <p>Beauty • Style • Confidence</p>
+  <p>© 2026 Glow Beauty. Academic Project Demonstration.</p>
+</footer>
+
+<script>
+// ---------- DATA AND STORAGE ----------
+const defaultServices = [
+  {id:1,name:"Haircut & Styling",price:500,duration:30,emoji:"💇‍♀️"},
+  {id:2,name:"Facial Treatment",price:800,duration:60,emoji:"🧖‍♀️"},
+  {id:3,name:"Manicure",price:400,duration:30,emoji:"💅"},
+  {id:4,name:"Bridal Makeup",price:3500,duration:120,emoji:"💄"},
+  {id:5,name:"Hair Spa",price:1000,duration:60,emoji:"🫧"},
+  {id:6,name:"Threading",price:150,duration:15,emoji:"✨"}
+];
+
+const defaultStylists = [
+  {id:1,name:"Priya Sharma",specialty:"Hair Styling",emoji:"👩🏻‍🦰"},
+  {id:2,name:"Ananya Rao",specialty:"Facial & Skincare",emoji:"👩🏽‍🦱"},
+  {id:3,name:"Meera Kumar",specialty:"Makeup Artist",emoji:"👩🏻"}
+];
+
+function load(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key));
+    return value === null ? fallback : value;
+  } catch {
+    return fallback;
+  }
+}
+function save(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+let services = load("glowServices", defaultServices);
+let stylists = load("glowStylists", defaultStylists);
+let reservations = load("glowReservations", []);
+let blockedSlots = load("glowBlockedSlots", []);
+let customers = load("glowCustomers", []);
+let reviews = load("glowReviews", []);
+let currentUser = load("glowCurrentUser", null);
+let editingId = null;
+
+const $ = id => document.getElementById(id);
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+};
+const money = amount => "₹" + Number(amount).toLocaleString("en-IN");
+const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+function notify(text) {
+  $("message").textContent = text;
+  setTimeout(() => {
+    if ($("message").textContent === text) $("message").textContent = "";
+  }, 4000);
+}
+function persist() {
+  save("glowServices", services);
+  save("glowStylists", stylists);
+  save("glowReservations", reservations);
+  save("glowBlockedSlots", blockedSlots);
+  save("glowCustomers", customers);
+  save("glowReviews", reviews);
+}
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(el => el.classList.add("hidden"));
+  $(page).classList.remove("hidden");
+  if (page === "services") renderServices();
+  if (page === "booking") {
+    populateBookingOptions();
+    updateSlots();
+    updateBookingSummary();
+    renderCalendar();
+  }
+  if (page === "dashboard") renderDashboard();
+  if (page === "manager") {
+    $("managerDate").value = $("managerDate").value || today();
+    $("blockDate").value = $("blockDate").value || today();
+    populateBlockTimes();
+    renderManager();
+  }
+  if (page === "feedback") renderReviews();
+  if (page === "account") updateProfile();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ---------- SERVICE AND STYLIST LISTS ----------
+function renderServices() {
+  const query = ($("search")?.value || "").toLowerCase();
+  const found = services.filter(s => s.name.toLowerCase().includes(query) ||
+    "glow beauty".includes(query));
+  $("serviceList").innerHTML = found.length ? found.map(s => `
+    <article class="card">
+      <div class="emoji">${safe(s.emoji || "💇‍♀️")}</div>
+      <div class="card-body">
+        <h3>${safe(s.name)}</h3>
+        <p>Duration: ${Number(s.duration)} minutes</p>
+        <div class="price">${money(s.price)}</div>
+        <button class="btn" style="margin-top:12px" onclick="startBooking(${s.id})">Book Now</button>
+      </div>
+    </article>`).join("") : "<p>No services found.</p>";
+
+  $("stylistList").innerHTML = stylists.map(s => `
+    <article class="card">
+      <div class="emoji">${safe(s.emoji || "💇‍♀️")}</div>
+      <div class="card-body"><h3>${safe(s.name)}</h3>
+      <p>${safe(s.specialty)}</p></div>
+    </article>`).join("");
+}
+function populateBookingOptions() {
+  $("service").innerHTML = services.map(s =>
+    `<option value="${s.id}">${safe(s.name)} — ${money(s.price)}</option>`).join("");
+  $("stylist").innerHTML = stylists.map(s =>
+    `<option value="${s.id}">${safe(s.name)} — ${safe(s.specialty)}</option>`).join("");
+  $("date").min = today();
+  populateBlockTimes();
+}
+function startBooking(serviceId) {
+  showPage("booking");
+  $("service").value = String(serviceId);
+  updateBookingSummary();
+}
+function getService(id) {
+  return services.find(s => s.id === Number(id));
+}
+function getStylist(id) {
+  return stylists.find(s => s.id === Number(id));
+}
+function updateBookingSummary() {
+  const service = getService($("service").value);
+  if (!service) {
+    $("bookingSummary").textContent = "Please add or select a service.";
+    return;
+  }
+  const deposit = $("paymentType").value === "deposit";
+  const amount = deposit ? Math.ceil(service.price * .30) : service.price;
+  $("bookingSummary").innerHTML =
+    `<strong>${safe(service.name)}</strong><br>
+     Total: ${money(service.price)}<br>
+     Pay now (demo): ${money(amount)}<br>
+     ${deposit ? "Remaining balance at salon: " + money(service.price - amount) : "Full amount selected."}`;
+}
+
+// ---------- AVAILABILITY ----------
+function makeSlots() {
+  const result = [];
+  for (let hour=9; hour<18; hour++) {
+    result.push(`${String(hour).padStart(2,"0")}:00`);
+    result.push(`${String(hour).padStart(2,"0")}:30`);
+  }
+  return result;
+}
+function hasConflict(date, time, stylistId, ignoreId=null, duration=30) {
+  const start = timeMinutes(time);
+  const end = start + duration;
+
+  const booked = reservations.some(r => {
+    if (r.id === ignoreId || r.date !== date ||
+        Number(r.stylistId) !== Number(stylistId) ||
+        r.status === "Cancelled" || r.status === "Unpaid - Cancelled") return false;
+    const rStart = timeMinutes(r.time);
+    const rEnd = rStart + Number(r.duration || 30);
+    return start < rEnd && end > rStart;
+  });
+
+  const blocked = blockedSlots.some(b => {
+    if (b.date !== date || Number(b.stylistId) !== Number(stylistId)) return false;
+    return b.time === time;
+  });
+
+  return booked || blocked;
+}
+function timeMinutes(t) {
+  const [h,m] = t.split(":").map(Number);
+  return h*60+m;
+}
+function updateSlots() {
+  const date = $("date").value;
+  const stylistId = $("stylist").value;
+  const service = getService($("service").value);
+  const previous = $("time").value;
+  const slots = makeSlots().filter(t => {
+    const end = timeMinutes(t) + Number(service?.duration || 30);
+    if (end > 18*60) return false;
+    if (date === today()) {
+      const now = new Date();
+      if (timeMinutes(t) <= now.getHours()*60 + now.getMinutes()) return false;
+    }
+    return !hasConflict(date,t,stylistId,editingId,service?.duration || 30);
+  });
+
+  $("time").innerHTML = slots.length
+    ? slots.map(t => `<option value="${t}">${formatTime(t)}</option>`).join("")
+    : `<option value="">No available slots</option>`;
+
+  if (slots.includes(previous)) $("time").value = previous;
+  renderCalendar();
+}
+function formatTime(t) {
+  const [h,m] = t.split(":").map(Number);
+  const suffix = h >= 12 ? "PM" : "AM";
+  return `${h%12 || 12}:${String(m).padStart(2,"0")} ${suffix}`;
+}
+
+// ---------- BOOKING CREATE / EDIT / CANCEL ----------
+$("bookingForm").addEventListener("submit", e => {
+  e.preventDefault();
+  if (!$("time").value) {
+    notify("No available time slot. Please select another date.");
+    return;
+  }
+
+  const email = $("customerEmail").value.trim().toLowerCase();
+  const date = $("date").value;
+  const time = $("time").value;
+  const service = getService($("service").value);
+  const stylist = getStylist($("stylist").value);
+
+  if (!service || !stylist || date < today()) {
+    notify("Please check your service, stylist, and date.");
+    return;
+  }
+  if (hasConflict(date,time,stylist.id,editingId,service.duration)) {
+    notify("This stylist is not available at that time.");
+    updateSlots();
+    return;
+  }
+
+  const paymentType = $("paymentType").value;
+  const paymentMethod = $("paymentMethod").value;
+  const amount = paymentType === "deposit"
+    ? Math.ceil(service.price * .30) : service.price;
+
+  // This only records a demo payment selection, not a transaction.
+  const reservation = {
+    id: editingId || Date.now(),
+    name: $("customer").value.trim(),
+    email,
+    phone: $("customerPhone").value.trim(),
+    salon: $("salon").value,
+    serviceId: service.id,
+    service: service.name,
+    price: Number(service.price),
+    duration: Number(service.duration),
+    stylistId: stylist.id,
+    stylist: stylist.name,
+    date, time,
+    paymentType,
+    paymentMethod,
+    amountDue: amount,
+    paid: paymentMethod === "Pay at Salon" ? 0 : 0,
+    paymentStatus: paymentMethod === "Pay at Salon" ? "Pay at Salon" : "Demo - Not Paid",
+    status: "Confirmed",
+    createdAt: new Date().toISOString()
+  };
+
+  if (editingId) {
+    reservations = reservations.map(r => r.id === editingId ? reservation : r);
+    editingId = null;
+    notify("Appointment updated successfully.");
+  } else {
+    reservations.push(reservation);
+    notify("Appointment saved! Payment and email are demo-only.");
+  }
+
+  persist();
+  if (currentUser && currentUser.email === email) {
+    $("customer").value = currentUser.name;
+  }
+  $("bookingForm").reset();
+  $("date").value = today();
+  populateBookingOptions();
+  updateSlots();
+  updateBookingSummary();
+  renderDashboard();
+  renderManager();
+  renderCalendar();
+  showPage("dashboard");
+});
+
+function cancelReservation(id) {
+  const r = reservations.find(x => x.id === id);
+  if (!r) return;
+  if (!confirm("Cancel this appointment?")) return;
+  r.status = "Cancelled";
+  persist();
+  renderDashboard();
+  renderManager();
+  renderCalendar();
+  updateSlots();
+  notify("Appointment cancelled.");
+}
+function editReservation(id) {
+  const r = reservations.find(x => x.id === id);
+  if (!r || r.status === "Cancelled") return;
+  editingId = id;
+  showPage("booking");
+  $("customer").value = r.name;
+  $("customerEmail").value = r.email;
+  $("customerPhone").value = r.phone;
+  $("salon").value = r.salon;
+  $("service").value = String(r.serviceId);
+  $("stylist").value = String(r.stylistId);
+  $("date").value = r.date;
+  $("paymentType").value = r.paymentType;
+  $("paymentMethod").value = r.paymentMethod;
+  updateSlots();
+  $("time").value = r.time;
+  updateBookingSummary();
+  notify("Edit your details and submit to update the appointment.");
+}
+
+// ---------- CUSTOMER DASHBOARD ----------
+function renderDashboard() {
+  const email = currentUser?.email?.toLowerCase();
+  const mine = reservations.filter(r => email && r.email.toLowerCase() === email);
+  const now = today();
+  const upcoming = mine.filter(r => r.date >= now &&
+    r.status !== "Cancelled" && r.status !== "Unpaid - Cancelled")
+    .sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+  const history = mine.filter(r => r.date < now || r.status === "Cancelled");
+
+  $("profileInfo").textContent = currentUser
+    ? `${currentUser.name} | ${currentUser.email} | ${currentUser.phone}`
+    : "Please log in to view your personal account. Without login, the demo shows no bookings here.";
+
+  $("upcoming").innerHTML = upcoming.length ? upcoming.map(r => reservationCard(r,true)).join("")
+    : "<p>No upcoming reservations.</p>";
+  $("history").innerHTML = history.length ? history.map(r => reservationCard(r,false)).join("")
+    : "<p>No previous reservations.</p>";
+}
+function reservationCard(r, canEdit) {
+  return `<div class="panel">
+    <div class="row"><h3>${safe(r.service)}</h3><span class="badge">${safe(r.status)}</span></div>
+    <p>Stylist: ${safe(r.stylist)}</p>
+    <p>Date: ${safe(r.date)} at ${formatTime(r.time)}</p>
+    <p>Price: ${money(r.price)} | Payment: ${safe(r.paymentStatus)}</p>
+    <p class="muted">${safe(r.paymentMethod)} — ${safe(r.paymentType)} payment</p>
+    ${canEdit ? `<button class="btn small" onclick="editReservation(${r.id})">Reschedule / Edit</button>
+    <button class="btn danger small" onclick="cancelReservation(${r.id})">Cancel</button>` : ""}
+  </div>`;
+}
+
+// ---------- CALENDAR ----------
+function renderCalendar() {
+  if (!$("calendar")) return;
+  const selectedMonth = $("calendarMonth").value || today().slice(0,7);
+  $("calendarMonth").value = selectedMonth;
+  const [year,month] = selectedMonth.split("-").map(Number);
+  const first = new Date(year,month-1,1);
+  const days = new Date(year,month,0).getDate();
+  let html = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+    .map(d => `<div class="calendar-heading">${d}</div>`).join("");
+  for (let i=0;i<first.getDay();i++) html += `<div class="day empty"></div>`;
+  for (let d=1;d<=days;d++) {
+    const date = `${year}-${String(month).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const count = reservations.filter(r => r.date===date && r.status!=="Cancelled").length;
+    const cls = `${date===today()?"today":""} ${count?"booked":""}`;
+    html += `<button class="day ${cls}" onclick="chooseDate('${date}')" aria-label="${date}, ${count} reservations">
+      <strong>${d}</strong>${count?`<br>${count} booking(s)`:""}
+    </button>`;
+  }
+  $("calendar").innerHTML = html;
+}
+function chooseDate(date) {
+  if (date < today()) {
+    notify("Please select today or a future date.");
+    return;
+  }
+  $("date").value = date;
+  updateSlots();
+  notify("Date selected: " + date);
+}
+
+// ---------- MANAGER TOOLS ----------
+function populateBlockTimes() {
+  if (!$("blockTime")) return;
+  const current = $("blockTime").value;
+  $("blockTime").innerHTML = makeSlots().map(t =>
+    `<option value="${t}">${formatTime(t)}</option>`).join("");
+  if (makeSlots().includes(current)) $("blockTime").value = current;
+}
+$("blockForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const date = $("blockDate").value;
+  const time = $("blockTime").value;
+  if (date < today()) {
+    notify("Choose today or a future date.");
+    return;
+  }
+  // An all-stylists block is applied to every current stylist.
+  stylists.forEach(s => {
+    const exists = blockedSlots.some(b => b.date===date && b.time===time && b.stylistId===s.id);
+    if (!exists) blockedSlots.push({date,time,stylistId:s.id,stylist:s.name});
+  });
+  persist();
+  renderManager();
+  updateSlots();
+  renderCalendar();
+  notify("Time slot blocked for all stylists.");
+});
+function unblockSlot(date,time,stylistId) {
+  blockedSlots = blockedSlots.filter(b =>
+    !(b.date===date && b.time===time && b.stylistId===stylistId));
+  persist();
+  renderManager();
+  updateSlots();
+  notify("Blocked slot removed.");
+}
+function renderManager() {
+  if (!$("allReservations")) return;
+  const date = $("managerDate").value || today();
+  const rows = reservations.slice().sort((a,b) =>
+    (a.date+a.time).localeCompare(b.date+b.time));
+  $("allReservations").innerHTML = rows.length ? `
+    <table><thead><tr><th>Customer</th><th>Service</th><th>Date / Time</th>
+    <th>Stylist</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr>
+      <td>${safe(r.name)}<br>${safe(r.phone)}<br>${safe(r.email)}</td>
+      <td>${safe(r.service)}</td>
+      <td>${safe(r.date)}<br>${formatTime(r.time)}</td>
+      <td>${safe(r.stylist)}</td>
+      <td>${money(r.price)}<br>${safe(r.paymentStatus)}</td>
+      <td><select onchange="changeStatus(${r.id},this.value)">
+        ${["Confirmed","Completed","Cancelled","Unpaid - Cancelled"].map(st=>
+          `<option ${r.status===st?"selected":""}>${st}</option>`).join("")}
+      </select></td>
+      <td><button class="btn small" onclick="editReservation(${r.id})">Edit</button>
+      <button class="btn small secondary" onclick="contactCustomer(${r.id})">Contact</button></td>
+    </tr>`).join("")}
+    </tbody></table>` : "<p>No reservations have been made.</p>";
+
+  const daily = reservations.filter(r => r.date===date && r.status!=="Cancelled");
+  $("managerCalendar").innerHTML = `<p><strong>${safe(date)}</strong>: ${daily.length} active reservation(s)</p>` +
+    (daily.map(r=>`<p>${formatTime(r.time)} — ${safe(r.name)} — ${safe(r.service)} — ${safe(r.stylist)}</p>`).join("") || "<p>No reservations for this date.</p>");
+
+  $("blockedList").innerHTML = blockedSlots.length ? blockedSlots.map(b=>`
+    <p>${safe(b.date)} — ${formatTime(b.time)} — ${safe(b.stylist)}
+    <button class="btn danger small" onclick="unblockSlot('${b.date}','${b.time}',${b.stylistId})">Unblock</button></p>`
+  ).join("") : "<p>No blocked slots.</p>";
+
+  $("customerAccounts").innerHTML = customers.length
+    ? customers.map(c=>`<p>${safe(c.name)} — ${safe(c.email)} — ${safe(c.phone)}</p>`).join("")
+    : "<p>No registered customers.</p>";
+}
+function changeStatus(id,status) {
+  const r = reservations.find(r=>r.id===id);
+  if (!r) return;
+  r.status = status;
+  persist();
+  renderManager();
+  renderDashboard();
+  renderCalendar();
+  updateSlots();
+  notify("Reservation status updated.");
+}
+function contactCustomer(id) {
+  const r = reservations.find(r=>r.id===id);
+  if (!r) return;
+  const phone = r.phone.replace(/[^\d+]/g,"");
+  const choice = prompt("Type CALL or SMS. Your device must support the selected action.");
+  if (!choice) return;
+  if (choice.toUpperCase()==="CALL") {
+    window.location.href = "tel:" + phone;
+  } else if (choice.toUpperCase()==="SMS") {
+    window.location.href = "sms:" + phone;
+  } else {
+    notify("Enter CALL or SMS.");
+  }
+}
+
+// ---------- SERVICE / STYLIST ADMIN ----------
+$("serviceForm").addEventListener("submit", e => {
+  e.preventDefault();
+  services.push({
+    id:Date.now(),name:$("newService").value.trim(),
+    price:Number($("newPrice").value),
+    duration:Number($("newDuration").value),emoji:"💇‍♀️"
+  });
+  persist();
+  e.target.reset();
+  populateBookingOptions();
+  renderServices();
+  updateBookingSummary();
+  notify("Service added.");
+});
+$("stylistForm").addEventListener("submit", e => {
+  e.preventDefault();
+  stylists.push({
+    id:Date.now(),name:$("newStylist").value.trim(),
+    specialty:$("newSpecialty").value.trim(),emoji:"💇‍♀️"
+  });
+  persist();
+  e.target.reset();
+  populateBookingOptions();
+  renderServices();
+  renderManager();
+  notify("Stylist added.");
+});
+
+// ---------- REGISTER / LOGIN ----------
+$("registerForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const email = $("regEmail").value.trim().toLowerCase();
+  if (customers.some(c=>c.email.toLowerCase()===email)) {
+    notify("An account with this email already exists.");
+    return;
+  }
+  const user = {
+    name:$("regName").value.trim(),
+    email,
+    phone:$("regPhone").value.trim(),
+    // Plain-text password is only for this local demo.
+    password:$("regPassword").value
+  };
+  customers.push(user);
+  currentUser = {name:user.name,email:user.email,phone:user.phone};
+  save("glowCurrentUser",currentUser);
+  persist();
+  e.target.reset();
+  updateProfile();
+  renderManager();
+  renderDashboard();
+  notify("Demo account created. Please use secure server authentication in production.");
+});
+$("loginForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const email = $("loginEmail").value.trim().toLowerCase();
+  const password = $("loginPassword").value;
+  const user = customers.find(c=>c.email.toLowerCase()===email && c.password===password);
+  if (!user) {
+    notify("Invalid email or password.");
+    return;
+  }
+  currentUser = {name:user.name,email:user.email,phone:user.phone};
+  save("glowCurrentUser",currentUser);
+  updateProfile();
+  renderDashboard();
+  e.target.reset();
+  notify("Login successful.");
+  showPage("dashboard");
+});
+function logout() {
+  currentUser = null;
+  localStorage.removeItem("glowCurrentUser");
+  updateProfile();
+  renderDashboard();
+  notify("You have logged out.");
+}
+function updateProfile() {
+  $("profileInfo").textContent = currentUser
+    ? `${currentUser.name} | ${currentUser.email} | ${currentUser.phone}`
+    : "You are not logged in.";
+  if (currentUser) {
+    $("customer").value = currentUser.name;
+    $("customerEmail").value = currentUser.email;
+    $("customerPhone").value = currentUser.phone;
+  }
+}
+
+// ---------- CUSTOMER FEEDBACK ----------
+$("feedbackForm").addEventListener("submit", e => {
+  e.preventDefault();
+  reviews.unshift({
+    name:$("reviewName").value.trim(),
+    rating:Number($("rating").value),
+    text:$("reviewText").value.trim(),
+    date:today()
+  });
+  persist();
+  e.target.reset();
+  renderReviews();
+  notify("Thank you for your feedback!");
+});
+function renderReviews() {
+  $("reviews").innerHTML = reviews.length ? reviews.map(r=>`
+    <div class="panel">
+      <h3>${safe(r.name)}</h3>
+      <p style="color:#d94f87">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</p>
+      <p>${safe(r.text)}</p><p class="muted">${safe(r.date)}</p>
+    </div>`).join("") : "<p>No feedback yet. Be the first to review us!</p>";
+}
+
+// ---------- AUTOMATIC UNPAID CANCELLATION DEMO ----------
+// In this front-end example, demo payments are not real.
+// Real automatic cancellation must run on a trusted server with payment
+// gateway webhooks and scheduled jobs, not in a customer's browser.
+function initialise() {
+  $("date").value = today();
+  $("managerDate").value = today();
+  $("blockDate").value = today();
+  $("calendarMonth").value = today().slice(0,7);
+  populateBookingOptions();
+  updateSlots();
+  updateBookingSummary();
+  renderServices();
+  renderDashboard();
+  renderManager();
+  renderCalendar();
+  renderReviews();
+  updateProfile();
+}
+initialise();
+</script>
+</body>
+</html>

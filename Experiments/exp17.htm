@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteOnline - E-Voting Platform</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f2f5fa;color:#222}
+header{background:#123b70;color:white;padding:20px;text-align:center}
+nav{background:#0b2850;padding:12px;text-align:center}
+nav button{margin:5px;padding:10px 16px;border:0;border-radius:5px;cursor:pointer}
+main{max-width:850px;margin:25px auto;padding:20px}
+.card{background:white;padding:22px;margin-bottom:20px;border-radius:10px;box-shadow:0 2px 8px #ccd3df}
+input,select{width:100%;padding:11px;margin:8px 0;border:1px solid #bbb;border-radius:5px}
+.action{background:#1769aa;color:white;border:0;padding:11px 18px;border-radius:5px;cursor:pointer}
+.danger{background:#b52b36;color:white}
+.hidden{display:none}
+.candidate{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:6px}
+footer{text-align:center;padding:15px;background:#123b70;color:white}
+</style>
+</head>
+<body>
+<header>
+<h1>VoteOnline</h1>
+<p>Secure • Accessible • Transparent E-Voting</p>
+</header>
+
+<nav>
+<button onclick="showSection('login')">Voter Login</button>
+<button onclick="showSection('vote')">Cast Vote</button>
+<button onclick="showSection('history')">Voting History</button>
+<button onclick="showSection('admin')">Admin</button>
+</nav>
+
+<main>
+<section id="login" class="card">
+<h2>Voter Login</h2>
+<input id="voterId" placeholder="Enter Voter ID">
+<button class="action" onclick="requestLoginOTP()">Get Login OTP</button>
+<input id="loginOtp" placeholder="Enter demo OTP">
+<button class="action" onclick="verifyLogin()">Verify & Login</button>
+<p id="loginMessage"></p>
+</section>
+
+<section id="vote" class="card hidden">
+<h2>Election Voting</h2>
+<p id="voterMessage">Log in to continue.</p>
+<button class="action" onclick="requestVotingOTP()">Get OTP for Voting</button>
+<input id="voteOtp" placeholder="Enter voting OTP">
+<div id="candidateList"></div>
+<button class="action" onclick="submitVote()">Submit Vote</button>
+<p id="voteMessage"></p>
+</section>
+
+<section id="history" class="card hidden">
+<h2>Voting History</h2>
+<div id="historyList">Log in to view your voting history.</div>
+</section>
+
+<section id="admin" class="card hidden">
+<h2>Admin Panel</h2>
+<p><b>Demo admin login:</b> username <code>admin</code>, password <code>admin123</code></p>
+<input id="adminUser" placeholder="Admin username">
+<input id="adminPass" type="password" placeholder="Admin password">
+<button class="action" onclick="adminLogin()">Admin Login</button>
+
+<div id="adminTools" class="hidden">
+<h3>Create Election Candidate</h3>
+<input id="candidateName" placeholder="Candidate name">
+<input id="candidateParty" placeholder="Party / option">
+<input id="candidateWard" placeholder="Election ward">
+<button class="action" onclick="addCandidate()">Add Candidate</button>
+
+<h3>Manage Voter List</h3>
+<input id="newVoter" placeholder="Voter ID to add">
+<button class="action" onclick="addVoter()">Add Voter</button>
+<label>Import voter list (.txt, one voter ID per line)</label>
+<input type="file" id="voterFile" accept=".txt">
+<button class="action" onclick="importVoters()">Import Voter List</button>
+<div id="voterList"></div>
+
+<h3>Election Results</h3>
+<button class="action" onclick="showResults()">Get Election Results</button>
+<div id="results"></div>
+</div>
+</section>
+</main>
+
+<footer>VoteOnline — Student Project Prototype</footer>
+
+<script type="text/plain" id="typescript-source">
+// Save this TypeScript section as app.ts.
+// Compile with: tsc app.ts --target ES2020 --lib DOM,ES2020
+// Then load the generated app.js from index.html.
+// Replace this placeholder script with the compiled JavaScript output.
+</script>
+<script src="app17.js"></script>
+</body>
+</html>

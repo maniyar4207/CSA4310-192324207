@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Layout Debugging</title>
+
+    <style>
+        /* Reset and Box Model */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background: #f1f4f8;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: #183153;
+            color: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-size: 26px;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            padding: 15px;
+            background: #25476a;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Layout */
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 25px auto;
+        }
+
+        .intro {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .intro h2 {
+            margin-bottom: 10px;
+            color: #183153;
+        }
+
+        /* CSS Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .content, .sidebar {
+            background: white;
+            padding: 22px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .content h2, .sidebar h2 {
+            margin-bottom: 12px;
+            color: #183153;
+        }
+
+        .content p {
+            margin-bottom: 12px;
+        }
+
+        /* Flexbox Cards */
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card {
+            flex: 1 1 150px;
+            min-width: 0;
+            padding: 18px;
+            text-align: center;
+            background: #e3edfa;
+            border-radius: 6px;
+        }
+
+        /* Relative Positioning */
+        .status {
+            position: relative;
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 12px;
+            background: #d7f5df;
+            color: #176534;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            background: #183153;
+            color: white;
+        }
+
+        /* Tablet Layout */
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                justify-content: center;
+                text-align: center;
+            }
+
+            nav {
+                gap: 15px;
+            }
+        }
+
+        /* Mobile Layout */
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 22px;
+            }
+
+            .container {
+                width: 94%;
+                margin: 15px auto;
+            }
+
+            .intro, .content, .sidebar {
+                padding: 16px;
+            }
+
+            nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .cards {
+                flex-direction: column;
+            }
+
+            .card {
+                flex-basis: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>CSS Layout Debugging</h1>
+        <p>Responsive Web Design</p>
+    </header>
+
+    <nav aria-label="Main navigation">
+        <a href="#home">Home</a>
+        <a href="#content">Content</a>
+        <a href="#sidebar">Sidebar</a>
+        <a href="#about">About</a>
+    </nav>
+
+    <main class="container" id="home">
+
+        <section class="intro">
+            <h2>Layout Debugging</h2>
+            <p>
+                This webpage demonstrates how CSS Grid, Flexbox,
+                the box model, and media queries prevent layout
+                overlapping on different screen sizes.
+            </p>
+            <span class="status">Layout Fixed</span>
+        </section>
+
+        <div class="content-grid">
+
+            <section class="content" id="content">
+                <h2>Main Content</h2>
+                <p>
+                    The main content area adjusts automatically
+                    according to the available screen width.
+                    Padding, margins, and borders are controlled
+                    using the CSS box model.
+                </p>
+
+                <p>
+                    Flexbox distributes cards evenly, while CSS
+                    Grid organizes the main content and sidebar.
+                    Media queries change the layout on smaller
+                    devices to avoid overlapping.
+                </p>
+
+                <div class="cards">
+                    <div class="card">
+                        <h3>Box Model</h3>
+                        <p>Controls margin, border, padding and content.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Flexbox</h3>
+                        <p>Aligns and distributes elements.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>CSS Grid</h3>
+                        <p>Creates flexible rows and columns.</p>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="sidebar" id="sidebar">
+                <h2>Sidebar</h2>
+                <p>
+                    The sidebar appears beside the main content
+                    on larger screens and moves below it on
+                    tablets and mobile devices.
+                </p>
+                <p>
+                    This prevents unwanted overlap during
+                    browser resizing.
+                </p>
+            </aside>
+
+        </div>
+    </main>
+
+    <footer id="about">
+        <p>&copy; 2026 CSS Layout Debugging Experiment</p>
+    </footer>
+
+</body>
+</html>

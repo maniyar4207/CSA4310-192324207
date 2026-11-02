@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReNewMarket</title>
+<style>
+body{font-family:Arial;margin:0;background:#f4f8f5;color:#333}
+header{background:#23734d;color:white;text-align:center;padding:20px}
+nav{text-align:center;background:#dcefe3;padding:12px}
+nav a{margin:10px;color:#23734d;text-decoration:none;font-weight:bold}
+main{padding:20px}
+section{background:white;padding:16px;margin:18px 0;border-radius:8px}
+input,select,button{padding:9px;margin:5px;border:1px solid #ccc;border-radius:5px}
+button{background:#23734d;color:white;cursor:pointer}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}
+.card{padding:12px;background:#eef7f0;border-radius:8px}
+</style>
+</head>
+<body>
+<header>
+<h1>♻️ ReNewMarket</h1>
+<p>Buy, Sell and Reuse Pre-Loved Products</p>
+</header>
+<nav>
+<a href="#home">Home</a><a href="#products">Products</a>
+<a href="#orders">Orders</a><a href="#admin">Admin</a>
+</nav>
+<main>
+
+<section id="home">
+<h2>User Login / Register</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login / Register</button>
+<button onclick="logout()">Logout</button>
+<p id="message">Please login to continue.</p>
+</section>
+
+<section>
+<h2>Search Products</h2>
+<input id="search" placeholder="Search second-hand items" oninput="showProducts()">
+<select id="filter" onchange="showProducts()">
+<option>All</option><option>Electronics</option>
+<option>Furniture</option><option>Clothing</option><option>Collectibles</option>
+</select>
+</section>
+
+<section id="products">
+<h2>Available Products</h2>
+<div class="products" id="productList"></div>
+</section>
+
+<section>
+<h2>Sell an Item</h2>
+<input id="itemName" placeholder="Item name">
+<input id="itemPrice" type="number" placeholder="Price">
+<select id="itemCategory">
+<option>Electronics</option><option>Furniture</option>
+<option>Clothing</option><option>Collectibles</option>
+</select>
+<input id="itemDesc" placeholder="Description">
+<button onclick="addProduct()">Create Listing</button>
+</section>
+
+<section id="orders">
+<h2>Order Management</h2>
+<div id="orderList"></div>
+</section>
+
+<section id="admin">
+<h2>Admin Panel</h2>
+<p>Demo admin account: <b>admin</b> / <b>admin123</b></p>
+<h3>Manage Users</h3>
+<div id="userList"></div>
+<h3>Manage Categories</h3>
+<input id="newCategory" placeholder="New category">
+<button onclick="addCategory()">Add Category</button>
+<div id="categoryList"></div>
+<h3>Manage Products</h3>
+<p>Edit or delete listings from the product cards.</p>
+</section>
+
+</main>
+<script>
+let users=[],products=[
+{id:1,name:"Used Headphones",price:800,category:"Electronics",desc:"Good working condition",seller:"Seller"},
+{id:2,name:"Wooden Chair",price:1200,category:"Furniture",desc:"Pre-owned chair",seller:"Seller"},
+{id:3,name:"Denim Jacket",price:500,category:"Clothing",desc:"Gently used jacket",seller:"Seller"},
+{id:4,name:"Vintage Clock",price:1500,category:"Collectibles",desc:"Decorative collectible",seller:"Seller"}
+];
+let categories=["Electronics","Furniture","Clothing","Collectibles"];
+let orders=[],currentUser="",isAdmin=false,nextId=5;
+
+function login(){
+let u=document.getElementById("username").value.trim();
+let p=document.getElementById("password").value;
+if(!u||!p)return alert("Enter username and password.");
+if(u==="admin"&&p==="admin123"){isAdmin=true;currentUser=u;}
+else{
+let old=users.find(x=>x.name===u&&x.pass===p);
+if(!old){users.push({name:u,pass:p});}
+currentUser=u;isAdmin=false;
+}
+document.getElementById("message").innerText="Logged in as "+currentUser;
+showUsers();
+}
+function logout(){currentUser="";isAdmin=false;document.getElementById("message").innerText="Logged out.";}
+function showProducts(){
+let q=document.getElementById("search").value.toLowerCase();
+let c=document.getElementById("filter").value;
+document.getElementById("productList").innerHTML=products.filter(p=>
+p.name.toLowerCase().includes(q)&&(c==="All"||p.category===c)).map(p=>
+`<div class="card"><h3>${p.name}</h3><p>${p.desc}</p>
+<p>Category: ${p.category}</p><b>₹${p.price}</b><p>Seller: ${p.seller}</p>
+<button onclick="buy(${p.id})">Order</button>
+<button onclick="negotiate(${p.id})">Negotiate</button>
+${isAdmin?`<button onclick="editProduct(${p.id})">Edit</button>
+<button onclick="deleteProduct(${p.id})">Delete</button>`:""}
+</div>`).join("")||"No items found.";
+}
+function addProduct(){
+if(!currentUser||isAdmin)return alert("Login as a seller first.");
+let name=document.getElementById("itemName").value.trim();
+let price=Number(document.getElementById("itemPrice").value);
+let category=document.getElementById("itemCategory").value;
+let desc=document.getElementById("itemDesc").value.trim();
+if(!name||price<=0)return alert("Enter valid item details.");
+products.push({id:nextId++,name,price,category,desc,seller:currentUser});
+showProducts();
+}
+function buy(id){
+if(!currentUser)return alert("Please login first.");
+let p=products.find(x=>x.id===id);
+orders.push({id:Date.now(),item:p.name,buyer:currentUser,status:"Shipped"});
+showOrders();alert("Demo order created.");
+}
+function negotiate(id){
+let p=products.find(x=>x.id===id);
+let offer=prompt("Enter your offer price:",p.price);
+if(offer)alert("Offer of ₹"+offer+" prepared for seller "+p.seller+".");
+}
+function editProduct(id){
+if(!isAdmin)return;
+let p=products.find(x=>x.id===id);
+let name=prompt("Edit item name:",p.name);
+let price=Number(prompt("Edit price:",p.price));
+if(name)p.name=name;
+if(price>0)p.price=price;
+showProducts();
+}
+function deleteProduct(id){
+if(!isAdmin)return;
+products=products.filter(p=>p.id!==id);
+showProducts();
+}
+function showOrders(){
+document.getElementById("orderList").innerHTML=orders.map(o=>
+`Order: ${o.item} | Buyer: ${o.buyer} | Status: ${o.status}
+<button onclick="changeStatus(${o.id})">Change Status</button>
+<button onclick="deleteOrder(${o.id})">Delete Order</button>`).join("<br>")||"No orders yet.";
+}
+function changeStatus(id){
+if(!isAdmin)return alert("Admin login required.");
+let o=orders.find(x=>x.id===id);
+o.status=o.status==="Shipped"?"Received":"Shipped";
+showOrders();
+}
+function deleteOrder(id){
+if(!isAdmin)return alert("Admin login required.");
+orders=orders.filter(o=>o.id!==id);showOrders();
+}
+function showUsers(){
+document.getElementById("userList").innerHTML=users.map((u,i)=>
+`${u.name} <button onclick="deleteUser(${i})">Delete User</button>`).join("<br>");
+}
+function deleteUser(i){
+if(!isAdmin)return alert("Admin login required.");
+users.splice(i,1);showUsers();
+}
+function addCategory(){
+if(!isAdmin)return alert("Admin login required.");
+let c=document.getElementById("newCategory").value.trim();
+if(c&&!categories.includes(c)){
+categories.push(c);
+document.getElementById("categoryList").innerText=categories.join(", ");
+let option=document.createElement("option");option.textContent=c;
+document.getElementById("filter").appendChild(option);
+document.getElementById("itemCategory").appendChild(option.cloneNode(true));
+}
+}
+showProducts();showOrders();
+</script>
+</body>
+</html>

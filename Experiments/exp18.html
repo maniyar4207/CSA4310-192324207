@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriMart - Agricultural Marketplace</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7ef;color:#263326}
+header{background:#246b35;color:white;padding:22px;text-align:center}
+nav{background:#174b28;padding:12px;text-align:center}
+nav button{margin:4px;padding:10px;border:0;border-radius:5px;cursor:pointer}
+main{max-width:1000px;margin:25px auto;padding:15px}
+section,.card{background:white;padding:20px;margin-bottom:20px;border-radius:10px;box-shadow:0 2px 8px #d4dfd0}
+input,select,textarea{width:100%;padding:10px;margin:7px 0;border:1px solid #bbb;border-radius:5px}
+button.action{background:#287c3c;color:white;border:0;padding:10px 15px;border-radius:5px;cursor:pointer;margin:4px}
+button.remove{background:#b52b36;color:white}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px}
+.product{border:1px solid #ddd;border-radius:8px;padding:14px}
+.product img{width:100%;height:140px;object-fit:cover;background:#eee}
+.hidden{display:none}
+small{color:#586858}
+footer{text-align:center;background:#174b28;color:white;padding:15px}
+</style>
+</head>
+<body>
+<header>
+<h1>🌱 AgriMart</h1>
+<p>Your Online Agricultural Marketplace</p>
+</header>
+
+<nav>
+<button onclick="show('shop')">Shop Products</button>
+<button onclick="show('register')">Register</button>
+<button onclick="show('login')">Farmer Login</button>
+<button onclick="show('dashboard')">Farmer Dashboard</button>
+<button onclick="logout()">Logout</button>
+</nav>
+
+<main>
+<section id="shop">
+<h2>Explore Agricultural Products</h2>
+<input id="search" placeholder="Search seeds, tools, fertilizers..." oninput="renderProducts()">
+<select id="category" onchange="renderProducts()">
+<option value="">All Categories</option>
+<option>Seeds</option><option>Fertilizers</option>
+<option>Pesticides</option><option>Equipment</option><option>Tools</option>
+</select>
+<div id="productList" class="products"></div>
+</section>
+
+<section id="register" class="hidden">
+<h2>Farmer Registration</h2>
+<input id="regName" placeholder="Full name">
+<input id="regEmail" type="email" placeholder="Email address">
+<input id="regPhone" placeholder="Phone number">
+<input id="regPass" type="password" placeholder="Password">
+<button class="action" onclick="registerFarmer()">Register</button>
+<p id="regMsg"></p>
+</section>
+
+<section id="login" class="hidden">
+<h2>Farmer Login</h2>
+<input id="loginEmail" type="email" placeholder="Email address">
+<input id="loginPass" type="password" placeholder="Password">
+<button class="action" onclick="loginFarmer()">Login</button>
+<div id="otpArea" class="hidden">
+<p id="otpMessage"></p>
+<input id="otpInput" placeholder="Enter demo OTP">
+<button class="action" onclick="verifyOTP()">Verify OTP</button>
+</div>
+<p id="loginMsg"></p>
+</section>
+
+<section id="dashboard" class="hidden">
+<h2>Farmer Dashboard</h2>
+<p id="welcome"></p>
+<div class="card">
+<h3>Add Product</h3>
+<input id="pName" placeholder="Product name">
+<select id="pCategory">
+<option>Seeds</option><option>Fertilizers</option>
+<option>Pesticides</option><option>Equipment</option><option>Tools</option>
+</select>
+<textarea id="pDescription" placeholder="Product description"></textarea>
+<input id="pPrice" type="number" min="1" placeholder="Price (₹)">
+<input id="pStock" type="number" min="0" placeholder="Stock quantity">
+<label>Upload product image</label>
+<input id="pImage" type="file" accept="image/*">
+<button class="action" onclick="addProduct()">Add Product</button>
+</div>
+<div class="card">
+<h3>My Products</h3>
+<div id="myProducts" class="products"></div>
+</div>
+<div class="card">
+<h3>Manage Orders / My Sales</h3>
+<div id="myOrders"></div>
+</div>
+</section>
+</main>
+
+<footer>AgriMart — Student Project Prototype</footer>
+
+<script type="text/plain" id="typescript-source">
+// TypeScript source goes in app.ts.
+// Compile using: tsc app.ts --target ES2020 --lib DOM,ES2020
+</script>
+<script src="app18.js"></script>
+</body>
+</html>

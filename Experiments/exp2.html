@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayEase Hotel Booking</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  color: #263238;
+}
+header {
+  background: #123047;
+  color: white;
+  padding: 22px;
+  text-align: center;
+}
+nav {
+  background: #087e8b;
+  padding: 12px;
+  text-align: center;
+}
+nav a { color: white; margin: 10px; text-decoration: none; }
+.container {
+  max-width: 950px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+}
+input, select, button {
+  padding: 10px;
+  margin: 6px 3px;
+  max-width: 100%;
+}
+button {
+  background: #087e8b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.room {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 12px 0;
+  border-radius: 8px;
+}
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #123047;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>StayEase Hotel</h1>
+  <p>Your comfort, our priority</p>
+</header>
+
+<nav>
+  <a href="#search">Book a Room</a>
+  <a href="#history">My Bookings</a>
+  <a href="#admin">Admin</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<div class="container">
+<h2>User Login / Registration</h2>
+<input id="username" placeholder="Enter your name">
+<button onclick="login()">Login / Register</button>
+<p id="userMessage">Please enter your name to continue.</p>
+
+<hr>
+<h2 id="search">Find Your Room</h2>
+
+<label>Check-in:</label>
+<input type="date" id="checkin">
+
+<label>Check-out:</label>
+<input type="date" id="checkout">
+
+<label>Guests:</label>
+<input type="number" id="guests" min="1" value="1">
+
+<button onclick="searchRooms()">Check Availability</button>
+
+<div id="rooms"></div>
+
+<hr>
+<h2 id="history">My Booking History</h2>
+<div id="bookingHistory">Log in to view your bookings.</div>
+
+<hr>
+<h2>My Profile</h2>
+<input id="profileName" placeholder="Updated name">
+<button onclick="updateProfile()">Update Profile</button>
+<p id="profileMessage"></p>
+
+<hr>
+<h2 id="admin">Administrator Panel</h2>
+<p>Demo administrator access: enter the username <b>admin</b>.</p>
+
+<select id="adminRoom">
+  <option value="Standard">Standard Room</option>
+  <option value="Deluxe">Deluxe Room</option>
+  <option value="Suite">Suite</option>
+  <option value="Family">Family Room</option>
+</select>
+<input type="number" id="adminPrice" placeholder="New price per night">
+<input type="number" id="adminQuantity" placeholder="Room quantity">
+<button onclick="updateRoom()">Update Room Details</button>
+<p id="adminMessage"></p>
+
+<hr>
+<h2>Room Information</h2>
+<p>Standard: Comfortable room for solo travelers.</p>
+<p>Deluxe: Spacious room with additional amenities.</p>
+<p>Suite: Premium room with a separate living area.</p>
+<p>Family: Larger room suitable for families.</p>
+
+<h2>About Us</h2>
+<p>StayEase provides comfortable accommodation for travelers.</p>
+
+<h2 id="contact">Contact Us</h2>
+<p>Email: support@stayease.example</p>
+<textarea id="contactMessage" placeholder="Enter your message"></textarea>
+<button onclick="contactUs()">Send Message</button>
+<p id="contactResult"></p>
+
+<h2>Customer Service FAQs</h2>
+<p><b>Q:</b> Can I cancel a booking?</p>
+<p><b>A:</b> Yes, subject to the three-day cancellation policy.</p>
+<p><b>Q:</b> How can I check availability?</p>
+<p><b>A:</b> Enter your dates and select Check Availability.</p>
+
+<h2>Local Travel Guide</h2>
+<p>Ask the hotel desk about nearby attractions and transport options.</p>
+
+<h2>Privacy Policy</h2>
+<p>This demonstration stores data only in the current page session.
+Do not enter sensitive personal or payment information.</p>
+</div>
+
+<footer>© 2026 StayEase Hotel Booking System</footer>
+
+<script>
+const rooms = [
+  {type:"Standard", price:1500, quantity:5},
+  {type:"Deluxe", price:2500, quantity:4},
+  {type:"Suite", price:4500, quantity:2},
+  {type:"Family", price:3500, quantity:3}
+];
+
+let user = "";
+let bookings = [];
+let nextId = 1;
+let selectedRoom = null;
+
+function login() {
+  const name = document.getElementById("username").value.trim();
+  if (!name) {
+    alert("Enter your name.");
+    return;
+  }
+  user = name;
+  document.getElementById("userMessage").textContent =
+    "Welcome, " + user + "!";
+  document.getElementById("profileName").value = user;
+  showBookings();
+}
+
+function updateProfile() {
+  if (!user) {
+    alert("Please log in first.");
+    return;
+  }
+  const name = document.getElementById("profileName").value.trim();
+  if (!name) return;
+  const oldName = user;
+  user = name;
+  bookings.forEach(b => {
+    if (b.user === oldName) b.user = user;
+  });
+  document.getElementById("username").value = user;
+  document.getElementById("userMessage").textContent =
+    "Profile updated: " + user;
+  showBookings();
+}
+
+function validDates() {
+  const start = document.getElementById("checkin").value;
+  const end = document.getElementById("checkout").value;
+  if (!start || !end || end <= start) {
+    alert("Select valid check-in and check-out dates.");
+    return false;
+  }
+  return true;
+}
+
+function nightsBetween(start, end) {
+  return Math.round((new Date(end + "T00:00:00") -
+    new Date(start + "T00:00:00")) / 86400000);
+}
+
+function occupied(roomType, start, end, ignoreId = null) {
+  return bookings.filter(b =>
+    b.type === roomType &&
+    b.id !== ignoreId &&
+    b.status === "Confirmed" &&
+    start < b.checkout && end > b.checkin
+  ).length;
+}
+
+function searchRooms() {
+  if (!validDates()) return;
+  const start = document.getElementById("checkin").value;
+  const end = document.getElementById("checkout").value;
+  const guests = Number(document.getElementById("guests").value);
+
+  if (guests < 1) {
+    alert("Enter at least one guest.");
+    return;
+  }
+
+  document.getElementById("rooms").innerHTML = rooms.map(r => {
+    const available = r.quantity - occupied(r.type, start, end);
+    const total = r.price * nightsBetween(start, end);
+    return `<div class="room">
+      <h3>${r.type} Room</h3>
+      <p>Price: ₹${r.price} per night</p>
+      <p>Total for ${nightsBetween(start,end)} night(s): ₹${total}</p>
+      <p>Available rooms: ${Math.max(0, available)}</p>
+      <button onclick="bookRoom('${r.type}')"
+        ${available <= 0 ? "disabled" : ""}>Book Now</button>
+    </div>`;
+  }).join("");
+}
+
+function bookRoom(type) {
+  if (!user) {
+    alert("Please log in first.");
+    return;
+  }
+  if (!validDates()) return;
+
+  const start = document.getElementById("checkin").value;
+  const end = document.getElementById("checkout").value;
+  const room = rooms.find(r => r.type === type);
+
+  if (room.quantity - occupied(type, start, end) <= 0) {
+    alert("No rooms available for these dates.");
+    searchRooms();
+    return;
+  }
+
+  const nights = nightsBetween(start, end);
+  bookings.push({
+    id: nextId++,
+    user, type, checkin: start, checkout: end,
+    guests: Number(document.getElementById("guests").value),
+    total: nights * room.price,
+    status: "Confirmed"
+  });
+
+  alert("Booking confirmed! Booking ID: " + (nextId - 1));
+  showBookings();
+  searchRooms();
+}
+
+function showBookings() {
+  const mine = bookings.filter(b => b.user === user);
+  document.getElementById("bookingHistory").innerHTML =
+    mine.map(b => `<div class="room">
+      <b>Booking #${b.id} — ${b.type}</b>
+      <p>${b.checkin} to ${b.checkout}</p>
+      <p>Guests: ${b.guests} | Total: ₹${b.total}</p>
+      <p>Status: ${b.status}</p>
+      ${b.status === "Confirmed" ? `
+      <button onclick="modifyBooking(${b.id})">Modify</button>
+      <button onclick="cancelBooking(${b.id})">Cancel</button>` : ""}
+    </div>`).join("") || "No bookings found.";
+}
+
+function allowedChange(b) {
+  const arrival = new Date(b.checkin + "T00:00:00");
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  return (arrival - today) / 86400000 >= 3;
+}
+
+function modifyBooking(id) {
+  const b = bookings.find(x => x.id === id && x.user === user);
+  if (!b || b.status !== "Confirmed") return;
+  if (!allowedChange(b)) {
+    alert("Bookings can only be modified at least 3 days before arrival.");
+    return;
+  }
+
+  const start = prompt("New check-in date (YYYY-MM-DD):", b.checkin);
+  const end = prompt("New check-out date (YYYY-MM-DD):", b.checkout);
+  if (!start || !end || end <= start) {
+    alert("Invalid dates.");
+    return;
+  }
+
+  const room = rooms.find(r => r.type === b.type);
+  if (room.quantity - occupied(b.type, start, end, b.id) <= 0) {
+    alert("No room available for the new dates.");
+    return;
+  }
+
+  b.checkin = start;
+  b.checkout = end;
+  b.total = nightsBetween(start, end) * room.price;
+  showBookings();
+  searchRooms();
+}
+
+function cancelBooking(id) {
+  const b = bookings.find(x => x.id === id && x.user === user);
+  if (!b || b.status !== "Confirmed") return;
+  if (!allowedChange(b)) {
+    alert("Bookings can only be cancelled at least 3 days before arrival.");
+    return;
+  }
+  b.status = "Cancelled";
+  showBookings();
+  searchRooms();
+}
+
+function updateRoom() {
+  if (user.toLowerCase() !== "admin") {
+    alert("Log in using username admin to access this demo panel.");
+    return;
+  }
+  const type = document.getElementById("adminRoom").value;
+  const room = rooms.find(r => r.type === type);
+  const price = Number(document.getElementById("adminPrice").value);
+  const quantity = Number(document.getElementById("adminQuantity").value);
+
+  if (price <= 0 || quantity < 0 ||
+      !Number.isFinite(price) || !Number.isInteger(quantity)) {
+    alert("Enter a positive price and a non-negative whole room quantity.");
+    return;
+  }
+
+  room.price = price;
+  room.quantity = quantity;
+  document.getElementById("adminMessage").textContent =
+    type + " room updated successfully.";
+  searchRooms();
+}
+
+function contactUs() {
+  const msg = document.getElementById("contactMessage").value.trim();
+  document.getElementById("contactResult").textContent =
+    msg ? "Demo message received." : "Please enter a message.";
+}
+</script>
+</body>
+</html>

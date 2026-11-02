@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: auto;
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px #00000020;
+        }
+
+        h2 {
+            text-align: center;
+            color: #183153;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: 2px solid #8bbcff;
+            border-color: #2459a9;
+        }
+
+        .error {
+            display: block;
+            color: #d00000;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .success {
+            color: #087443;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 22px;
+            background: #183153;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #25476a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Registration Form</h2>
+
+        <form id="registrationForm" novalidate>
+
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name"
+                   placeholder="Enter your full name"
+                   autocomplete="name" required>
+            <span class="error" id="nameError" aria-live="polite"></span>
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email"
+                   placeholder="example@gmail.com"
+                   autocomplete="email" required>
+            <span class="error" id="emailError" aria-live="polite"></span>
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone"
+                   placeholder="10-digit mobile number"
+                   inputmode="numeric" autocomplete="tel"
+                   maxlength="10" required>
+            <span class="error" id="phoneError" aria-live="polite"></span>
+
+            <button type="submit">Register</button>
+
+            <p id="result" class="success" role="status"
+               aria-live="polite"></p>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById("registrationForm");
+        const nameInput = document.getElementById("name");
+        const emailInput = document.getElementById("email");
+        const phoneInput = document.getElementById("phone");
+        const result = document.getElementById("result");
+
+        // Regular Expressions
+        const emailPattern =
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        // Validates a 10-digit Indian mobile number starting with 6-9
+        const phonePattern = /^[6-9]\d{9}$/;
+
+        function validateName() {
+            const error = document.getElementById("nameError");
+            const valid = nameInput.value.trim().length >= 2;
+
+            error.textContent = valid
+                ? ""
+                : "Please enter a name with at least 2 characters.";
+
+            return valid;
+        }
+
+        function validateEmail() {
+            const error = document.getElementById("emailError");
+            const email = emailInput.value.trim();
+            const valid = emailPattern.test(email);
+
+            error.textContent = valid
+                ? ""
+                : "Please enter a valid email address.";
+
+            return valid;
+        }
+
+        function validatePhone() {
+            const error = document.getElementById("phoneError");
+            const phone = phoneInput.value.trim();
+            const valid = phonePattern.test(phone);
+
+            error.textContent = valid
+                ? ""
+                : "Enter a valid 10-digit Indian mobile number.";
+
+            return valid;
+        }
+
+        // Real-time validation
+        nameInput.addEventListener("input", () => {
+            validateName();
+            result.textContent = "";
+        });
+
+        emailInput.addEventListener("input", () => {
+            validateEmail();
+            result.textContent = "";
+        });
+
+        phoneInput.addEventListener("input", () => {
+            validatePhone();
+            result.textContent = "";
+        });
+
+        // Validate before submission
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const nameValid = validateName();
+            const emailValid = validateEmail();
+            const phoneValid = validatePhone();
+
+            if (nameValid && emailValid && phoneValid) {
+                result.textContent =
+                    "Registration form validated successfully!";
+
+                result.style.color = "#087443";
+            } else {
+                result.textContent =
+                    "Please correct the errors before submitting.";
+
+                result.style.color = "#d00000";
+            }
+        });
+    </script>
+
+</body>
+</html>

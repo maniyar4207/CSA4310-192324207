@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlossomGifts</title>
+<style>
+body{font-family:Arial;margin:0;background:#fff7fa;color:#333}
+header{background:#c43d72;color:white;text-align:center;padding:20px}
+nav{text-align:center;background:#ffe1ec;padding:12px}
+nav a{margin:10px;color:#9d2454;text-decoration:none;font-weight:bold}
+main{padding:20px}
+section{margin-bottom:25px}
+input,select,button{padding:9px;margin:5px;border:1px solid #ddd;border-radius:5px}
+button{background:#c43d72;color:white;cursor:pointer}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}
+.card{background:white;padding:12px;border-radius:8px;box-shadow:0 2px 6px #e6cbd5}
+.card img{width:100%;height:150px;object-fit:cover}
+.price{color:#b52d62;font-weight:bold}
+</style>
+</head>
+<body>
+<header>
+<h1>🌸 BlossomGifts</h1>
+<p>Flowers, Gifts & Happy Moments</p>
+</header>
+<nav>
+<a href="#home">Home</a><a href="#shop">Shop</a>
+<a href="#cart">Cart</a><a href="#orders">Orders</a>
+<a href="#admin">Admin</a>
+</nav>
+<main>
+
+<section id="home">
+<h2>Shop by Category</h2>
+<p>Flowers | Bouquets | Gift Baskets | Cakes | Personalized Gifts | Birthday | Anniversary</p>
+<input id="search" placeholder="Search gifts..." oninput="showProducts()">
+<select id="category" onchange="showProducts()">
+<option>All</option><option>Flowers</option><option>Gift Baskets</option>
+<option>Personalized Gifts</option><option>Cakes</option>
+</select>
+</section>
+
+<section>
+<h2>Login / Register</h2>
+<input id="username" placeholder="Customer name">
+<input id="email" type="email" placeholder="Email address">
+<button onclick="login()">Login / Register</button>
+<button onclick="logout()">Logout</button>
+<p id="message">Guest</p>
+</section>
+
+<section id="shop">
+<h2>Available Gifts</h2>
+<div class="products" id="productList"></div>
+</section>
+
+<section id="cart">
+<h2>Shopping Cart</h2>
+<div id="cartList"></div>
+<p id="total">Total: ₹0</p>
+<label>Delivery date:</label><input type="date" id="deliveryDate">
+<label>Delivery time:</label><select id="deliveryTime">
+<option>Morning</option><option>Afternoon</option><option>Evening</option>
+</select><br>
+<button onclick="checkout()">Checkout</button>
+</section>
+
+<section id="orders">
+<h2>Order Status & History</h2>
+<div id="orderList"></div>
+</section>
+
+<section>
+<h2>Contact Us</h2>
+<input id="question" placeholder="Your enquiry">
+<button onclick="emailUs()">Send Enquiry</button>
+</section>
+
+<section id="admin">
+<h2>Admin - Inventory Management</h2>
+<input id="newName" placeholder="Gift name">
+<input id="newPrice" type="number" placeholder="Price">
+<input id="newCategory" placeholder="Category">
+<button onclick="addProduct()">Add Product</button>
+<h3>Customer Checkout Details</h3>
+<div id="customerList"></div>
+<h3>Order Summary</h3>
+<div id="summary"></div>
+</section>
+</main>
+
+<script>
+let products=[
+{id:1,name:"Rose Bouquet",price:599,category:"Flowers",img:"https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400"},
+{id:2,name:"Gift Basket",price:999,category:"Gift Baskets",img:"https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=400"},
+{id:3,name:"Birthday Cake",price:799,category:"Cakes",img:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400"},
+{id:4,name:"Personalized Gift",price:499,category:"Personalized Gifts",img:"https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400"}
+];
+let cart=[],orders=[],user="Guest",email="";
+function login(){
+user=document.getElementById("username").value.trim();
+email=document.getElementById("email").value.trim();
+if(!user)return alert("Enter your name.");
+document.getElementById("message").innerText="Welcome, "+user;
+}
+function logout(){user="Guest";email="";document.getElementById("message").innerText="Logged out";}
+function showProducts(){
+let q=document.getElementById("search").value.toLowerCase();
+let c=document.getElementById("category").value;
+document.getElementById("productList").innerHTML=products.filter(p=>
+p.name.toLowerCase().includes(q)&&(c==="All"||p.category===c)).map(p=>
+`<div class="card"><img src="${p.img}" alt="${p.name}">
+<h3>${p.name}</h3><p>${p.category}</p>
+<p class="price">₹${p.price}</p>
+<button onclick="details(${p.id})">Details</button>
+<button onclick="addCart(${p.id})">Add to Cart</button>
+<button onclick="editPrice(${p.id})">Edit Price</button>
+<button onclick="deleteProduct(${p.id})">Delete</button></div>`
+).join("")||"No gifts found.";
+}
+function details(id){
+let p=products.find(p=>p.id===id);
+alert(p.name+"\nCategory: "+p.category+"\nPrice: ₹"+p.price);
+}
+function addCart(id){cart.push(id);showCart();}
+function showCart(){
+document.getElementById("cartList").innerHTML=cart.map((id,i)=>{
+let p=products.find(p=>p.id===id);
+return p?`${p.name} - ₹${p.price}
+<button onclick="changeQty(${i},-1)">Remove</button><br>`:"";
+}).join("");
+document.getElementById("total").innerText="Total: ₹"+
+cart.reduce((s,id)=>s+(products.find(p=>p.id===id)?.price||0),0);
+}
+function changeQty(i){cart.splice(i,1);showCart();}
+function checkout(){
+if(user==="Guest")return alert("Please login first.");
+if(!cart.length)return alert("Cart is empty.");
+let date=document.getElementById("deliveryDate").value;
+if(!date)return alert("Choose a delivery date.");
+let total=cart.reduce((s,id)=>s+(products.find(p=>p.id===id)?.price||0),0);
+orders.push({user,email,items:cart.map(id=>products.find(p=>p.id===id)?.name).join(", "),
+total,date,time:document.getElementById("deliveryTime").value,status:"Order Placed"});
+cart=[];showCart();showOrders();
+alert("Demo order placed!");
+}
+function showOrders(){
+document.getElementById("orderList").innerHTML=orders.map((o,i)=>
+`Order ${i+1}: ${o.items} | ₹${o.total} | Delivery: ${o.date} (${o.time}) | ${o.status}`).join("<br>");
+document.getElementById("customerList").innerHTML=orders.map(o=>
+`${o.user} | ${o.email} | ${o.items}`).join("<br>");
+document.getElementById("summary").innerText="Total orders: "+orders.length+
+" | Sales total: ₹"+orders.reduce((s,o)=>s+o.total,0);
+}
+function addProduct(){
+let name=document.getElementById("newName").value.trim();
+let price=Number(document.getElementById("newPrice").value);
+let category=document.getElementById("newCategory").value.trim();
+if(!name||price<=0||!category)return alert("Enter valid product details.");
+products.push({id:Date.now(),name,price,category,
+img:"https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400"});
+showProducts();
+}
+function editPrice(id){
+let p=products.find(p=>p.id===id),v=Number(prompt("New price:",p.price));
+if(v>0){p.price=v;showProducts();showCart();}
+}
+function deleteProduct(id){
+if(confirm("Delete this gift?")){products=products.filter(p=>p.id!==id);showProducts();}
+}
+function emailUs(){
+let q=document.getElementById("question").value.trim();
+if(!q)return alert("Enter your enquiry.");
+location.href="mailto:hello@blossomgifts.example?subject=Gift%20Enquiry&body="+encodeURIComponent(q);
+}
+showProducts();showCart();showOrders();
+</script>
+</body>
+</html>

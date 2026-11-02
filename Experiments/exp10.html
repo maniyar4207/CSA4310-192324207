@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StyleHub Fashion Store</title>
+<style>
+body{font-family:Arial;margin:0;background:#f8f5f7;color:#333}
+header{background:#7b2457;color:white;padding:18px;text-align:center}
+nav{background:#eee;padding:12px;text-align:center}
+nav a{margin:10px;color:#7b2457;text-decoration:none;font-weight:bold}
+.container{padding:20px}
+input,select,button{padding:9px;margin:5px;border:1px solid #ccc;border-radius:5px}
+button{background:#7b2457;color:white;cursor:pointer}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
+.card{background:white;padding:15px;text-align:center;border-radius:8px;box-shadow:0 2px 5px #ddd}
+.card img{width:100%;height:160px;object-fit:cover}
+.price{color:#7b2457;font-weight:bold}
+section{margin-bottom:25px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>StyleHub</h1>
+<p>Discover Your Style | Fashion for Everyone</p>
+</header>
+
+<nav>
+<a href="#home">Home</a><a href="#products">Shop</a>
+<a href="#cart">Cart</a><a href="#orders">Orders</a>
+<a href="#admin">Admin</a>
+</nav>
+
+<div class="container">
+<section id="home">
+<h2>Shop by Category</h2>
+<p>Men | Women | Kids | Footwear | Accessories | Casual Wear | Formal Wear | Seasonal</p>
+<input id="search" placeholder="Search fashion items..." oninput="displayProducts()">
+<select id="category" onchange="displayProducts()">
+<option value="All">All Categories</option>
+<option>Men</option><option>Women</option><option>Kids</option>
+<option>Footwear</option><option>Accessories</option>
+</select>
+</section>
+
+<section>
+<h2>Login / Register</h2>
+<input id="username" placeholder="Enter username">
+<button onclick="login()">Login / Register</button>
+<button onclick="logout()">Logout</button>
+<p id="message">Guest user</p>
+</section>
+
+<section id="products">
+<h2>Fashion Collection</h2>
+<div class="products" id="productList"></div>
+</section>
+
+<section id="cart">
+<h2>Shopping Cart</h2>
+<div id="cartItems"></div>
+<p id="total">Total: ₹0</p>
+<button onclick="checkout()">Checkout</button>
+</section>
+
+<section id="orders">
+<h2>Order History & Status</h2>
+<div id="orderList"></div>
+</section>
+
+<section id="admin">
+<h2>Admin: Manage Products</h2>
+<input id="pname" placeholder="Product name">
+<input id="pprice" type="number" placeholder="Price">
+<input id="pcategory" placeholder="Category">
+<input id="pdesc" placeholder="Description">
+<button onclick="addProduct()">Add Product</button>
+<p>Use the Edit Price and Remove buttons on products to manage the catalogue.</p>
+<h3>Customer Checkout Information</h3>
+<div id="customerList"></div>
+</section>
+</div>
+
+<script>
+let products=[
+{id:1,name:"Men's Shirt",price:799,category:"Men",desc:"Comfortable casual shirt",img:"https://images.unsplash.com/photo-1603252109303-2751441dd157?w=400"},
+{id:2,name:"Women's Dress",price:1499,category:"Women",desc:"Elegant fashion dress",img:"https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400"},
+{id:3,name:"Kids Outfit",price:599,category:"Kids",desc:"Everyday kids clothing",img:"https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=400"},
+{id:4,name:"Sneakers",price:1999,category:"Footwear",desc:"Stylish everyday footwear",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"},
+{id:5,name:"Fashion Bag",price:999,category:"Accessories",desc:"Trendy everyday bag",img:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400"}
+];
+let cart=[],orders=[],user="Guest";
+
+function displayProducts(){
+let q=document.getElementById("search").value.toLowerCase();
+let c=document.getElementById("category").value;
+document.getElementById("productList").innerHTML=products.filter(p=>
+p.name.toLowerCase().includes(q)&&(c==="All"||p.category===c))
+.map(p=>`<div class="card">
+<img src="${p.img}" alt="${p.name}">
+<h3>${p.name}</h3><p>${p.desc}</p>
+<p class="price">₹${p.price}</p>
+<button onclick="addCart(${p.id})">Add to Cart</button>
+<button onclick="details(${p.id})">Details</button>
+<button onclick="editPrice(${p.id})">Edit Price</button>
+<button onclick="removeProduct(${p.id})">Remove</button>
+</div>`).join("")||"No products found.";
+}
+function details(id){
+let p=products.find(x=>x.id===id);
+alert(p.name+"\n"+p.desc+"\nPrice: ₹"+p.price+"\nCategory: "+p.category+
+"\nSize guide: Check the product label before ordering.");
+}
+function login(){
+user=document.getElementById("username").value.trim()||"Guest";
+document.getElementById("message").innerText="Logged in as: "+user;
+}
+function logout(){user="Guest";document.getElementById("message").innerText="Logged out";}
+function addCart(id){cart.push(id);displayCart();}
+function displayCart(){
+let counts={};cart.forEach(id=>counts[id]=(counts[id]||0)+1);
+document.getElementById("cartItems").innerHTML=Object.keys(counts).map(id=>{
+let p=products.find(x=>x.id==id);
+return p?`${p.name} × ${counts[id]}
+<button onclick="changeQty(${id},1)">+</button>
+<button onclick="changeQty(${id},-1)">−</button>
+<button onclick="removeCart(${id})">Remove</button><br>`:"";
+}).join("");
+let total=cart.reduce((s,id)=>s+(products.find(p=>p.id===id)?.price||0),0);
+document.getElementById("total").innerText="Total: ₹"+total;
+}
+function changeQty(id,n){
+if(n>0)cart.push(id);
+else{let i=cart.indexOf(id);if(i>=0)cart.splice(i,1);}
+displayCart();
+}
+function removeCart(id){cart=cart.filter(x=>x!==id);displayCart();}
+function checkout(){
+if(!cart.length)return alert("Your cart is empty.");
+if(user==="Guest")return alert("Please login before checkout.");
+let total=cart.reduce((s,id)=>s+(products.find(p=>p.id===id)?.price||0),0);
+orders.push({customer:user,items:cart.map(id=>products.find(p=>p.id===id)?.name).join(", "),total,status:"Order Placed"});
+cart=[];displayCart();displayOrders();
+alert("Demo order placed successfully!");
+}
+function displayOrders(){
+document.getElementById("orderList").innerHTML=orders.map((o,i)=>
+`Order ${i+1}: ${o.items} | ₹${o.total} | Status: ${o.status}`).join("<br>")||"No orders yet.";
+document.getElementById("customerList").innerHTML=orders.map(o=>
+`${o.customer} | ${o.items} | ₹${o.total}`).join("<br>")||"No customer checkouts yet.";
+}
+function addProduct(){
+let name=document.getElementById("pname").value.trim();
+let price=Number(document.getElementById("pprice").value);
+let category=document.getElementById("pcategory").value.trim();
+let desc=document.getElementById("pdesc").value.trim();
+if(!name||price<=0||!category)return alert("Enter valid product details.");
+products.push({id:Date.now(),name,price,category,desc:desc||"Fashion item",
+img:"https://images.unsplash.com/photo-1445205170230-053b83016050?w=400"});
+displayProducts();
+}
+function editPrice(id){
+let p=products.find(x=>x.id===id);
+let price=Number(prompt("Enter new price:",p.price));
+if(price>0){p.price=price;displayProducts();displayCart();}
+}
+function removeProduct(id){
+if(confirm("Remove this product?")){products=products.filter(p=>p.id!==id);displayProducts();}
+}
+displayProducts();displayCart();displayOrders();
+</script>
+</body>
+</html>

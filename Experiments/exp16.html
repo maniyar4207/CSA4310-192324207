@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ComplainEase</title>
+<style>
+body{font-family:Arial;margin:0;background:#f2f6fc;color:#333}
+header{background:#174a7e;color:white;text-align:center;padding:20px}
+nav{background:#dceafa;text-align:center;padding:12px}
+nav a{margin:10px;color:#174a7e;text-decoration:none;font-weight:bold}
+main{padding:20px}
+section{background:white;padding:16px;margin:18px 0;border-radius:8px}
+input,select,textarea,button{padding:9px;margin:5px;border:1px solid #ccc;border-radius:5px}
+button{background:#174a7e;color:white;cursor:pointer}
+.card{background:#edf4fc;padding:12px;margin:10px 0;border-radius:6px}
+</style>
+</head>
+<body>
+<header>
+<h1>ComplainEase</h1>
+<p>Register • Track • Resolve Complaints</p>
+</header>
+<nav>
+<a href="#user">User</a><a href="#officer">Officer</a><a href="#admin">Admin</a>
+</nav>
+<main>
+
+<section id="user">
+<h2>User Login / Register</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="app.registerUser()">Register</button>
+<button onclick="app.loginUser()">Login</button>
+<button onclick="app.logout()">Logout</button>
+<p id="userMsg"></p>
+
+<h3>Post Complaint</h3>
+<input id="complaintTitle" placeholder="Complaint title">
+<select id="category">
+<option>Road</option><option>Water</option><option>Electricity</option>
+<option>Sanitation</option><option>Other</option>
+</select>
+<textarea id="description" placeholder="Describe complaint"></textarea>
+<input id="location" placeholder="Location / Area">
+<input id="proof" type="file" accept="image/*,.pdf">
+<button onclick="app.postComplaint()">Submit Complaint</button>
+
+<h3>My Complaints</h3>
+<div id="userComplaints"></div>
+<h3>Feedback</h3>
+<input id="feedback" placeholder="Enter feedback">
+<button onclick="app.sendFeedback()">Submit Feedback</button>
+<h3>Admin Contact</h3>
+<p>Email: admin@example.com | Phone: 000-000-0000 (demo)</p>
+</section>
+
+<section id="officer">
+<h2>Officer Login</h2>
+<input id="officerName" placeholder="Officer ID">
+<input id="officerPassword" type="password" placeholder="Password">
+<button onclick="app.loginOfficer()">Login</button>
+<p id="officerMsg"></p>
+<h3>Complaints Assigned / All Complaints</h3>
+<div id="officerComplaints"></div>
+</section>
+
+<section id="admin">
+<h2>Admin Login</h2>
+<input id="adminName" placeholder="Admin username">
+<input id="adminPassword" type="password" placeholder="Password">
+<button onclick="app.loginAdmin()">Login</button>
+<p id="adminMsg"></p>
+<h3>Create Officer Account</h3>
+<input id="newOfficer" placeholder="Officer ID">
+<input id="newOfficerPass" placeholder="Password">
+<button onclick="app.createOfficer()">Create Officer</button>
+<h3>Manage Accounts</h3>
+<div id="accounts"></div>
+<h3>Website Features</h3>
+<label><input type="checkbox" id="featureComplaint" checked> Enable complaint submission</label>
+<button onclick="app.updateFeatures()">Save Features</button>
+<h3>All Complaints</h3>
+<div id="adminComplaints"></div>
+</section>
+
+<section>
+<h2>Complaint Location Map</h2>
+<p>Enter the complaint location above, then use Google Maps to find the area.</p>
+<a href="https://maps.google.com/" target="_blank">Open Google Maps</a>
+</section>
+</main>
+
+<script src="app16.js"></script>
+</body>
+</html>

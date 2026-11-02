@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Price Calculation</title>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $("#calculate").click(function() {
+                var total = 0;
+
+                $("#productTable tbody tr").each(function() {
+                    var quantity = parseInt($(this).find(".quantity").val());
+                    var rate = parseFloat($(this).find(".rate").val());
+
+                    var price = quantity * rate;
+
+                    $(this).find(".total").text(price.toFixed(2));
+
+                    total += price;
+                });
+
+                $("#grandTotal").text(total.toFixed(2));
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <h2>Product Price Table</h2>
+
+    <table border="1" id="productTable">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Rate of Price</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>Pen</td>
+                <td><input type="number" class="quantity" value="2"></td>
+                <td><input type="number" class="rate" value="15"></td>
+                <td class="total">0.00</td>
+            </tr>
+
+            <tr>
+                <td>Notebook</td>
+                <td><input type="number" class="quantity" value="3"></td>
+                <td><input type="number" class="rate" value="50"></td>
+                <td class="total">0.00</td>
+            </tr>
+            <tr>
+                <td>Pencil</td>
+                <td><input type="number" class="quantity" value="2"></td>
+                <td><input type="number" class="rate" value="10"></td>
+                <td class="total">0.00</td>
+            </tr>
+
+            <tr>
+                <td>Eraser</td>
+                <td><input type="number" class="quantity" value="3"></td>
+                <td><input type="number" class="rate" value="5"></td>
+                <td class="total">0.00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <button id="calculate">Calculate Total</button>
+
+    <h3>Grand Total: ₹<span id="grandTotal">0.00</span></h3>
+
+</body>
+</html>

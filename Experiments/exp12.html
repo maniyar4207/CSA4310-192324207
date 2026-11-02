@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InsureEasy</title>
+<style>
+body{font-family:Arial;margin:0;background:#f2f7fc;color:#333}
+header{background:#145da0;color:white;padding:20px;text-align:center}
+nav{text-align:center;background:#dceafa;padding:12px}
+nav a{margin:10px;color:#145da0;text-decoration:none;font-weight:bold}
+main{padding:20px}
+section{background:white;padding:18px;margin:18px 0;border-radius:8px}
+input,select,button{padding:10px;margin:5px;border:1px solid #ccc;border-radius:5px}
+button{background:#145da0;color:white;cursor:pointer}
+.card{background:#edf5ff;padding:12px;margin:10px 0;border-radius:6px}
+</style>
+</head>
+<body>
+<header>
+<h1>InsureEasy</h1>
+<p>Simple Insurance and Policy Management</p>
+</header>
+<nav>
+<a href="#admin">Admin</a><a href="#agent">Agent</a>
+<a href="#customer">Customer</a><a href="#policies">Policies</a>
+</nav>
+<main>
+
+<section id="admin">
+<h2>Admin Login</h2>
+<input id="adminUser" placeholder="Admin username">
+<input id="adminPass" type="password" placeholder="Password">
+<button onclick="adminLogin()">Login</button>
+<p id="adminMsg"></p>
+<h3>Approve Agent</h3>
+<div id="agents"></div>
+<h3>All Agent Details</h3>
+<div id="agentDetails"></div>
+</section>
+
+<section id="agent">
+<h2>Agent Registration / Login</h2>
+<input id="agentName" placeholder="Agent name">
+<input id="agentPhone" placeholder="Phone number">
+<input id="agentPassword" type="password" placeholder="Password">
+<button onclick="registerAgent()">Register</button>
+<button onclick="agentLogin()">Login</button>
+<p id="agentMsg"></p>
+
+<h3>Create Customer</h3>
+<input id="customerName" placeholder="Customer name">
+<input id="customerPhone" placeholder="Customer phone">
+<button onclick="createCustomer()">Add Customer</button>
+
+<h3>Manage Customers</h3>
+<div id="customerList"></div>
+
+<h3>Manage Policies</h3>
+<select id="policyType">
+<option>Health Insurance</option>
+<option>Auto Insurance</option>
+<option>Home Insurance</option>
+</select>
+<input id="premium" type="number" placeholder="Premium amount">
+<button onclick="addPolicy()">Add Policy</button>
+
+<h3>Renewal Reminder</h3>
+<button onclick="sendAlert()">Send Demo Alert</button>
+<p id="alertMsg"></p>
+</section>
+
+<section id="customer">
+<h2>Customer Login</h2>
+<input id="userName" placeholder="Customer name">
+<button onclick="customerLogin()">Login</button>
+<p id="userMsg"></p>
+<h3>My Policies</h3>
+<div id="myPolicies"></div>
+</section>
+
+<section id="policies">
+<h2>Available Insurance Policies</h2>
+<div id="policyList"></div>
+</section>
+
+</main>
+<script>
+let agentData=[],customerData=[],policyData=[];
+let currentAgent=null,currentCustomer=null;
+
+function registerAgent(){
+let name=document.getElementById("agentName").value.trim();
+let phone=document.getElementById("agentPhone").value.trim();
+let password=document.getElementById("agentPassword").value;
+if(!name||!phone||!password)return alert("Fill all agent details.");
+agentData.push({name,phone,password,approved:false});
+showAgents();
+document.getElementById("agentMsg").innerText="Registration submitted for admin approval.";
+}
+function adminLogin(){
+if(document.getElementById("adminUser").value==="admin"&&
+document.getElementById("adminPass").value==="admin123"){
+document.getElementById("adminMsg").innerText="Admin login successful.";
+showAgents();
+}else alert("Demo admin: username admin, password admin123");
+}
+function showAgents(){
+document.getElementById("agents").innerHTML=agentData.map((a,i)=>
+`<div class="card">${a.name} - ${a.phone} - ${a.approved?"Approved":"Pending"}
+${a.approved?"":`<button onclick="approveAgent(${i})">Approve</button>`}</div>`).join("");
+document.getElementById("agentDetails").innerHTML=agentData.map(a=>
+`${a.name} | ${a.phone} | ${a.approved?"Approved":"Pending"}`).join("<br>");
+}
+function approveAgent(i){agentData[i].approved=true;showAgents();}
+function agentLogin(){
+let name=document.getElementById("agentName").value;
+let pass=document.getElementById("agentPassword").value;
+let a=agentData.find(x=>x.name===name&&x.password===pass&&x.approved);
+if(!a)return alert("Invalid login or agent not approved.");
+currentAgent=a;
+document.getElementById("agentMsg").innerText="Welcome, "+a.name;
+}
+function createCustomer(){
+if(!currentAgent)return alert("Login with an approved agent first.");
+let name=document.getElementById("customerName").value.trim();
+let phone=document.getElementById("customerPhone").value.trim();
+if(!name||!phone)return alert("Enter customer details.");
+customerData.push({name,phone,agent:currentAgent.name,policies:[]});
+showCustomers();
+}
+function showCustomers(){
+document.getElementById("customerList").innerHTML=customerData.map(c=>
+`<div class="card">${c.name} | ${c.phone} | Agent: ${c.agent}</div>`).join("");
+}
+function addPolicy(){
+if(!currentAgent)return alert("Agent login required.");
+let type=document.getElementById("policyType").value;
+let premium=Number(document.getElementById("premium").value);
+if(premium<=0)return alert("Enter a valid premium.");
+let p={type,premium,agent:currentAgent.name};
+policyData.push(p);
+customerData.forEach(c=>{if(c.agent===currentAgent.name)c.policies.push(p);});
+showPolicies();
+}
+function showPolicies(){
+document.getElementById("policyList").innerHTML=policyData.map(p=>
+`<div class="card"><b>${p.type}</b><p>Premium: ₹${p.premium}</p>
+Agent: ${p.agent}</div>`).join("")||"No policies available.";
+}
+function customerLogin(){
+let name=document.getElementById("userName").value.trim();
+let c=customerData.find(x=>x.name===name);
+if(!c)return alert("Customer not found. Ask an agent to register you.");
+currentCustomer=c;
+document.getElementById("userMsg").innerText="Welcome, "+c.name;
+document.getElementById("myPolicies").innerHTML=c.policies.map(p=>
+`${p.type} - Premium: ₹${p.premium}`).join("<br>")||"No policies assigned.";
+}
+function sendAlert(){
+if(!currentAgent)return alert("Agent login required.");
+document.getElementById("alertMsg").innerText=
+"Demo reminder prepared for customers of "+currentAgent.name+
+". Real SMS requires an SMS gateway and customer consent.";
+}
+showAgents();showCustomers();showPolicies();
+</script>
+</body>
+</html>

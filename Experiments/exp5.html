@@ -1,0 +1,656 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyBook - Flight Reservation</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+header {
+  background: #123047;
+  color: white;
+  padding: 24px;
+  text-align: center;
+}
+nav {
+  background: #087e8b;
+  padding: 13px;
+  text-align: center;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 10px;
+}
+.container {
+  max-width: 950px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+}
+input, select, textarea, button {
+  padding: 10px;
+  margin: 5px 3px;
+  max-width: 100%;
+}
+button {
+  background: #087e8b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+.flight, .ticket, .feedback {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 12px 0;
+}
+.seats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(40px, 1fr));
+  gap: 8px;
+  max-width: 350px;
+}
+.seat { padding: 12px 4px; }
+.selected { background: #16a34a; }
+.booked { background: #64748b; }
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #123047;
+  color: white;
+}
+@media(max-width:600px) {
+  .container { margin: 10px; padding: 12px; }
+  input, select, textarea { width: 100%; margin: 5px 0; }
+  nav a { display: inline-block; margin: 6px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>SkyBook</h1>
+  <p>Your Journey Begins Here</p>
+</header>
+
+<nav>
+  <a href="#search">Search Flights</a>
+  <a href="#mytickets">My Tickets</a>
+  <a href="#status">Booking Status</a>
+  <a href="#feedback">Feedback</a>
+  <a href="#admin">Admin</a>
+</nav>
+
+<div class="container">
+
+<h2>Login / Registration</h2>
+<input id="username" placeholder="Enter your name">
+<button onclick="login()">Login / Register</button>
+<button onclick="forgotPassword()">Forgot Password?</button>
+<p id="welcome">Please log in to continue.</p>
+
+<hr>
+<h2 id="search">Search Flights</h2>
+
+<input id="source" placeholder="Departure city">
+<input id="destination" placeholder="Destination city">
+<input type="date" id="travelDate">
+
+<select id="travelClass">
+  <option value="Economy">Economy</option>
+  <option value="Business">Business</option>
+  <option value="First">First Class</option>
+</select>
+
+<button onclick="searchFlights()">Search Flights</button>
+<div id="flightResults"></div>
+
+<hr>
+<h2>Select Seats</h2>
+<p id="selectedFlight">Select a flight first.</p>
+<div id="seatLayout" class="seats"></div>
+<p id="seatInfo">Selected seats: None</p>
+
+<hr>
+<h2>Passenger Details</h2>
+<input id="passengerName" placeholder="Passenger full name">
+<input id="passengerAge" type="number" min="1" max="120"
+       placeholder="Passenger age">
+
+<button onclick="proceedToPayment()">Proceed to Payment</button>
+<p id="paymentSummary"></p>
+
+<h3>Ticket Payment</h3>
+<select id="paymentMethod">
+  <option value="Card">Card (demo)</option>
+  <option value="UPI">UPI (demo)</option>
+  <option value="Net Banking">Net Banking (demo)</option>
+</select>
+<button onclick="payAndBook()">Pay and Book</button>
+<p id="paymentMessage"></p>
+
+<hr>
+<h2 id="mytickets">My Tickets</h2>
+<div id="ticketList">Log in to view your tickets.</div>
+
+<hr>
+<h2 id="status">View Booking Status</h2>
+<input id="bookingReference" placeholder="Enter booking reference">
+<button onclick="checkStatus()">Check Status</button>
+<p id="statusResult"></p>
+
+<hr>
+<h2>Cancel Ticket</h2>
+<input id="cancelReference" placeholder="Enter booking reference">
+<button onclick="cancelTicket()">Cancel Ticket</button>
+<p id="cancelMessage"></p>
+
+<hr>
+<h2 id="feedback">Customer Feedback</h2>
+<select id="rating">
+  <option value="5">5 - Excellent</option>
+  <option value="4">4 - Very Good</option>
+  <option value="3">3 - Good</option>
+  <option value="2">2 - Fair</option>
+  <option value="1">1 - Poor</option>
+</select>
+<textarea id="feedbackText" placeholder="Write your feedback"></textarea>
+<button onclick="submitFeedback()">Submit Feedback</button>
+<div id="feedbackList"></div>
+
+<hr>
+<h2 id="admin">Administrator Panel</h2>
+<p>Demo access: log in using the username <b>admin</b>.</p>
+
+<h3>Add Flight</h3>
+<input id="newAirline" placeholder="Airline name">
+<input id="newSource" placeholder="Departure city">
+<input id="newDestination" placeholder="Destination city">
+<input id="newTime" placeholder="Departure time">
+<input id="newSeats" type="number" min="1" placeholder="Seat count">
+<button onclick="addFlight()">Add Flight</button>
+
+<h3>Update Flight Fare</h3>
+<select id="manageFlight"></select>
+<select id="manageClass">
+  <option value="Economy">Economy</option>
+  <option value="Business">Business</option>
+  <option value="First">First Class</option>
+</select>
+<input id="newFare" type="number" min="1" placeholder="New fare">
+<input id="updatedSeats" type="number" min="1" placeholder="New seat count">
+<button onclick="updateFlight()">Update Flight</button>
+
+<h3>Admin Booking Report</h3>
+<button onclick="generateReport()">Generate Report</button>
+<div id="report"></div>
+
+</div>
+
+<footer>© 2026 SkyBook Flight Reservation System</footer>
+
+<script>
+let currentUser = "";
+let flights = [
+  {
+    id: 1, airline: "Sky Airways",
+    from: "Chennai", to: "Delhi",
+    time: "08:00 AM", seats: 8,
+    fares: {Economy: 4500, Business: 9000, First: 15000}
+  },
+  {
+    id: 2, airline: "Air Connect",
+    from: "Chennai", to: "Mumbai",
+    time: "11:30 AM", seats: 8,
+    fares: {Economy: 3500, Business: 7500, First: 12000}
+  }
+];
+
+let bookings = [];
+let feedback = [];
+let nextReference = 100001;
+let selectedFlightId = null;
+let selectedSeats = [];
+let pendingBooking = null;
+
+function login() {
+  const name = document.getElementById("username").value.trim();
+
+  if (!name) {
+    alert("Enter your name.");
+    return;
+  }
+
+  currentUser = name;
+  document.getElementById("welcome").textContent =
+    "Welcome, " + currentUser + "!";
+
+  showTickets();
+}
+
+function forgotPassword() {
+  alert("Demo only: password recovery requires a registered account and a secure backend.");
+}
+
+function validSearch() {
+  const from = document.getElementById("source").value.trim();
+  const to = document.getElementById("destination").value.trim();
+  const date = document.getElementById("travelDate").value;
+
+  if (!from || !to || !date) {
+    alert("Enter departure, destination and travel date.");
+    return false;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (new Date(date + "T00:00:00") < today) {
+    alert("Travel date cannot be in the past.");
+    return false;
+  }
+
+  return true;
+}
+
+function availableSeats(flightId, date) {
+  const flight = flights.find(f => f.id === flightId);
+  const occupied = bookings
+    .filter(b => b.flightId === flightId &&
+      b.date === date && b.status === "Confirmed")
+    .reduce((total, b) => total + b.seats.length, 0);
+
+  return Math.max(0, flight.seats - occupied);
+}
+
+function searchFlights() {
+  if (!validSearch()) return;
+
+  const from = document.getElementById("source").value.trim();
+  const to = document.getElementById("destination").value.trim();
+  const date = document.getElementById("travelDate").value;
+  const cls = document.getElementById("travelClass").value;
+
+  const results = flights.filter(f =>
+    f.from.toLowerCase() === from.toLowerCase() &&
+    f.to.toLowerCase() === to.toLowerCase()
+  );
+
+  document.getElementById("flightResults").innerHTML =
+    results.map(f => `
+      <div class="flight">
+        <h3>${f.airline}</h3>
+        <p>${f.from} → ${f.to}</p>
+        <p>Departure: ${f.time}</p>
+        <p>Class: ${cls}</p>
+        <p>Fare: ₹${f.fares[cls]}</p>
+        <p>Available seats: ${availableSeats(f.id, date)}</p>
+        <button onclick="selectFlight(${f.id})">Select Flight</button>
+      </div>
+    `).join("") || "No flights found for this route.";
+
+  refreshFlightOptions();
+}
+
+function selectFlight(id) {
+  selectedFlightId = id;
+  selectedSeats = [];
+  pendingBooking = null;
+
+  const flight = flights.find(f => f.id === id);
+  const cls = document.getElementById("travelClass").value;
+
+  document.getElementById("selectedFlight").textContent =
+    flight.airline + " | " + flight.time +
+    " | " + cls + " | ₹" + flight.fares[cls];
+
+  renderSeats();
+}
+
+function renderSeats() {
+  const flight = flights.find(f => f.id === selectedFlightId);
+  const date = document.getElementById("travelDate").value;
+
+  if (!flight || !date) return;
+
+  const occupied = bookings
+    .filter(b => b.flightId === flight.id &&
+      b.date === date && b.status === "Confirmed")
+    .flatMap(b => b.seats);
+
+  document.getElementById("seatLayout").innerHTML =
+    Array.from({length: flight.seats}, (_, i) => {
+      const seat = i + 1;
+      const isBooked = occupied.includes(seat);
+      const isSelected = selectedSeats.includes(seat);
+
+      return `<button class="seat ${
+        isBooked ? "booked" : isSelected ? "selected" : ""
+      }" ${isBooked ? "disabled" : ""}
+        onclick="toggleSeat(${seat})">${seat}</button>`;
+    }).join("");
+
+  const cls = document.getElementById("travelClass").value;
+
+  document.getElementById("seatInfo").textContent =
+    "Selected seats: " + (selectedSeats.join(", ") || "None") +
+    " | Total: ₹" + selectedSeats.length * flight.fares[cls];
+}
+
+function toggleSeat(seat) {
+  selectedSeats = selectedSeats.includes(seat)
+    ? selectedSeats.filter(s => s !== seat)
+    : [...selectedSeats, seat];
+
+  pendingBooking = null;
+  renderSeats();
+}
+
+function proceedToPayment() {
+  if (!currentUser) {
+    alert("Please log in first.");
+    return;
+  }
+
+  if (!selectedFlightId || selectedSeats.length === 0) {
+    alert("Select a flight and at least one seat.");
+    return;
+  }
+
+  const name = document.getElementById("passengerName").value.trim();
+  const age = Number(document.getElementById("passengerAge").value);
+
+  if (!name || !Number.isInteger(age) || age < 1 || age > 120) {
+    alert("Enter valid passenger details.");
+    return;
+  }
+
+  const flight = flights.find(f => f.id === selectedFlightId);
+  const cls = document.getElementById("travelClass").value;
+  const date = document.getElementById("travelDate").value;
+
+  pendingBooking = {
+    user: currentUser,
+    passenger: name,
+    age,
+    flightId: flight.id,
+    airline: flight.airline,
+    from: flight.from,
+    to: flight.to,
+    date,
+    cls,
+    seats: [...selectedSeats],
+    fare: flight.fares[cls] * selectedSeats.length
+  };
+
+  document.getElementById("paymentSummary").textContent =
+    "Flight: " + flight.airline +
+    " | Seats: " + selectedSeats.join(", ") +
+    " | Total fare: ₹" + pendingBooking.fare;
+}
+
+function payAndBook() {
+  if (!pendingBooking) {
+    alert("Enter passenger details and proceed to payment first.");
+    return;
+  }
+
+  const flight = flights.find(f => f.id === pendingBooking.flightId);
+  const date = pendingBooking.date;
+
+  const occupied = bookings
+    .filter(b => b.flightId === flight.id &&
+      b.date === date && b.status === "Confirmed")
+    .flatMap(b => b.seats);
+
+  if (pendingBooking.seats.some(s => occupied.includes(s))) {
+    alert("A selected seat is no longer available. Search again.");
+    pendingBooking = null;
+    selectedSeats = [];
+    renderSeats();
+    return;
+  }
+
+  const booking = {
+    ...pendingBooking,
+    reference: String(nextReference++),
+    paymentMethod: document.getElementById("paymentMethod").value,
+    status: "Confirmed"
+  };
+
+  bookings.push(booking);
+
+  document.getElementById("paymentMessage").textContent =
+    "Demo booking successful! Reference: " + booking.reference +
+    ". Payment is simulated; no money was charged.";
+
+  selectedSeats = [];
+  pendingBooking = null;
+  showTickets();
+  searchFlights();
+  renderSeats();
+}
+
+function showTickets() {
+  const mine = bookings.filter(b => b.user === currentUser);
+
+  document.getElementById("ticketList").innerHTML =
+    mine.map(b => `
+      <div class="ticket" id="ticket-${b.reference}">
+        <h3>SkyBook E-Ticket</h3>
+        <p>Reference: ${b.reference}</p>
+        <p>Passenger: ${b.passenger}, Age: ${b.age}</p>
+        <p>Airline: ${b.airline}</p>
+        <p>Route: ${b.from} → ${b.to}</p>
+        <p>Date: ${b.date}</p>
+        <p>Class: ${b.cls} | Seat(s): ${b.seats.join(", ")}</p>
+        <p>Total fare: ₹${b.fare}</p>
+        <p>Status: ${b.status}</p>
+        ${b.status === "Confirmed" ? `
+          <button onclick="printTicket('${b.reference}')">Print Ticket</button>
+          <button onclick="cancelTicket('${b.reference}')">Cancel</button>
+        ` : ""}
+      </div>
+    `).join("") || "No bookings found.";
+}
+
+function printTicket(reference) {
+  const booking = bookings.find(b => b.reference === reference);
+  if (!booking || booking.status !== "Confirmed") return;
+
+  const ticket = document.getElementById("ticket-" + reference);
+  const win = window.open("", "_blank");
+
+  if (!win) {
+    alert("Allow pop-ups to print the ticket.");
+    return;
+  }
+
+  win.document.write(
+    "<html><body>" + ticket.innerHTML + "</body></html>"
+  );
+  win.document.close();
+  win.print();
+}
+
+function checkStatus() {
+  const ref = document.getElementById("bookingReference").value.trim();
+  const booking = bookings.find(b =>
+    b.reference === ref && b.user === currentUser
+  );
+
+  document.getElementById("statusResult").textContent =
+    booking ? "Booking " + ref + ": " + booking.status
+    : "Booking not found for your account.";
+}
+
+function cancelTicket(reference) {
+  const booking = bookings.find(b =>
+    b.reference === reference && b.user === currentUser
+  );
+
+  if (!booking || booking.status !== "Confirmed") return;
+
+  const days = (
+    new Date(booking.date + "T00:00:00") -
+    new Date(new Date().toDateString())
+  ) / 86400000;
+
+  if (days < 3) {
+    alert("Cancellation is allowed only at least 3 days before departure.");
+    return;
+  }
+
+  if (!confirm("Cancel this flight booking?")) return;
+
+  booking.status = "Cancelled";
+  showTickets();
+  searchFlights();
+
+  if (selectedFlightId === booking.flightId) renderSeats();
+}
+
+function submitFeedback() {
+  if (!currentUser) {
+    alert("Please log in first.");
+    return;
+  }
+
+  const text = document.getElementById("feedbackText").value.trim();
+
+  if (!text) {
+    alert("Enter your feedback.");
+    return;
+  }
+
+  feedback.push({
+    user: currentUser,
+    rating: document.getElementById("rating").value,
+    text
+  });
+
+  document.getElementById("feedbackList").innerHTML =
+    feedback.map(f => `
+      <div class="feedback">
+        <b>${f.user}</b> — ${f.rating}/5
+        <p>${escapeHTML(f.text)}</p>
+      </div>
+    `).join("");
+
+  document.getElementById("feedbackText").value = "";
+}
+
+function escapeHTML(text) {
+  return text.replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  })[c]);
+}
+
+function addFlight() {
+  if (currentUser.toLowerCase() !== "admin") {
+    alert("Admin login required.");
+    return;
+  }
+
+  const airline = document.getElementById("newAirline").value.trim();
+  const from = document.getElementById("newSource").value.trim();
+  const to = document.getElementById("newDestination").value.trim();
+  const time = document.getElementById("newTime").value.trim();
+  const seats = Number(document.getElementById("newSeats").value);
+
+  if (!airline || !from || !to || !time ||
+      !Number.isInteger(seats) || seats < 1) {
+    alert("Enter valid flight details.");
+    return;
+  }
+
+  flights.push({
+    id: Date.now(), airline, from, to, time, seats,
+    fares: {Economy: 4500, Business: 9000, First: 15000}
+  });
+
+  refreshFlightOptions();
+  alert("Flight added successfully.");
+}
+
+function refreshFlightOptions() {
+  document.getElementById("manageFlight").innerHTML =
+    flights.map(f => `<option value="${f.id}">${f.airline}</option>`)
+      .join("");
+}
+
+function updateFlight() {
+  if (currentUser.toLowerCase() !== "admin") {
+    alert("Admin login required.");
+    return;
+  }
+
+  const id = Number(document.getElementById("manageFlight").value);
+  const cls = document.getElementById("manageClass").value;
+  const fare = Number(document.getElementById("newFare").value);
+  const seats = Number(document.getElementById("updatedSeats").value);
+  const flight = flights.find(f => f.id === id);
+
+  if (!flight || !Number.isFinite(fare) || fare <= 0 ||
+      !Number.isInteger(seats) || seats < 1) {
+    alert("Enter a valid fare and seat quantity.");
+    return;
+  }
+
+  const highestOccupiedSeat = bookings
+    .filter(b => b.flightId === id && b.status === "Confirmed")
+    .flatMap(b => b.seats)
+    .reduce((max, seat) => Math.max(max, seat), 0);
+
+  if (seats < highestOccupiedSeat) {
+    alert("Seat quantity cannot be lower than an occupied seat number.");
+    return;
+  }
+
+  flight.fares[cls] = fare;
+  flight.seats = seats;
+
+  searchFlights();
+  if (selectedFlightId === id) renderSeats();
+
+  alert("Flight information updated.");
+}
+
+function generateReport() {
+  if (currentUser.toLowerCase() !== "admin") {
+    alert("Admin login required.");
+    return;
+  }
+
+  const confirmed = bookings.filter(b => b.status === "Confirmed");
+  const cancelled = bookings.filter(b => b.status === "Cancelled");
+  const revenue = confirmed.reduce((sum, b) => sum + b.fare, 0);
+
+  document.getElementById("report").innerHTML = `
+    <p>Total bookings: ${bookings.length}</p>
+    <p>Confirmed bookings: ${confirmed.length}</p>
+    <p>Cancelled bookings: ${cancelled.length}</p>
+    <p>Confirmed booking value: ₹${revenue}</p>
+    <p>Feedback entries: ${feedback.length}</p>
+  `;
+}
+
+refreshFlightOptions();
+</script>
+</body>
+</html>

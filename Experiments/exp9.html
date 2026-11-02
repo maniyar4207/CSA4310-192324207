@@ -1,0 +1,709 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechSavvy | Electronics Store</title>
+<style>
+:root {
+  --blue:#1769d2;
+  --dark:#172337;
+  --light:#f1f6ff;
+  --green:#14845b;
+  --red:#d43f4d;
+  --muted:#697789;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:Arial,sans-serif; color:var(--dark); background:#f7f9fc; line-height:1.6; }
+button,input,select,textarea { font:inherit; }
+button { cursor:pointer; }
+header {
+  background:#fff; padding:15px 5%; display:flex; align-items:center;
+  justify-content:space-between; gap:15px; flex-wrap:wrap;
+  box-shadow:0 2px 12px #0000000c; position:sticky; top:0; z-index:5;
+}
+.logo { color:var(--blue); font-size:25px; font-weight:bold; }
+nav { display:flex; flex-wrap:wrap; gap:5px; }
+nav button { border:0; background:transparent; padding:8px; font-weight:bold; color:var(--dark); }
+nav button:hover { color:var(--blue); }
+.hero { text-align:center; padding:55px 15px; background:linear-gradient(120deg,#dceaff,#eef6ff); }
+.hero h1 { font-size:clamp(30px,5vw,45px); }
+.hero p { color:var(--muted); margin:10px 0 20px; }
+.container { max-width:1200px; margin:auto; padding:30px 18px; }
+.title { font-size:27px; margin-bottom:20px; }
+.grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:17px; }
+.card,.panel { background:white; border:1px solid #e2e9f1; border-radius:11px; overflow:hidden; }
+.card { box-shadow:0 3px 12px #00000005; }
+.card-body { padding:15px; }
+.card h3 { margin-bottom:6px; }
+.card p { color:var(--muted); margin:5px 0; font-size:14px; }
+.product-image { height:150px; display:grid; place-items:center; font-size:66px; background:#edf4ff; }
+.price { font-size:21px; color:var(--blue); font-weight:bold; }
+.old-price { text-decoration:line-through; color:#888; font-size:13px; margin-left:5px; }
+.btn { border:0; border-radius:6px; background:var(--blue); color:white; padding:10px 14px; font-weight:bold; margin-top:8px; }
+.btn:hover { opacity:.86; }
+.btn.green { background:var(--green); }
+.btn.red { background:var(--red); }
+.btn.dark { background:var(--dark); }
+.btn.small { padding:6px 9px; font-size:12px; }
+.btn.light { background:#e6efff; color:var(--blue); }
+.filters { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; margin-bottom:22px; }
+input,select,textarea { width:100%; padding:11px; border:1px solid #ccd7e4; border-radius:6px; background:white; color:var(--dark); }
+label { display:block; font-weight:bold; font-size:14px; margin-bottom:4px; }
+.field { margin-bottom:12px; }
+form { display:grid; gap:5px; }
+.panel { padding:20px; margin-bottom:20px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.row { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.badge { background:#e2f5e9; color:#176f48; padding:3px 9px; border-radius:14px; font-size:12px; }
+.notice { padding:12px; background:#eaf3ff; border-radius:7px; margin:12px 0; font-size:14px; }
+.muted { color:var(--muted); font-size:13px; }
+.hidden { display:none!important; }
+.category-list { display:flex; flex-wrap:wrap; gap:9px; margin-bottom:25px; }
+.category-list button { background:white; border:1px solid #dce5ef; border-radius:20px; padding:8px 14px; }
+.category-list button:hover { background:#eaf3ff; }
+table { width:100%; border-collapse:collapse; min-width:700px; }
+th,td { text-align:left; padding:10px; border-bottom:1px solid #e7edf4; }
+th { background:#eaf3ff; }
+.table-wrap { overflow-x:auto; }
+#message { padding:0 18px; color:var(--green); font-weight:bold; }
+footer { text-align:center; background:var(--dark); color:white; padding:25px; margin-top:25px; }
+hr { border:0; border-top:1px solid #e5eaf0; margin:15px 0; }
+@media(max-width:900px) {
+  .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .filters { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:550px) {
+  header { position:static; padding:12px; }
+  nav button { font-size:12px; padding:5px; }
+  .grid,.two-col,.filters { grid-template-columns:1fr; }
+  .container { padding:22px 12px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚡ TechSavvy</div>
+  <nav>
+    <button onclick="showPage('home')">Home</button>
+    <button onclick="showPage('shop')">Shop</button>
+    <button onclick="showPage('cart')">Cart (<span id="cartCount">0</span>)</button>
+    <button onclick="showPage('wishlist')">Wishlist</button>
+    <button onclick="showPage('orders')">My Orders</button>
+    <button onclick="showPage('account')">Login / Signup</button>
+    <button onclick="showPage('admin')">Admin</button>
+    <button onclick="logout()">Logout</button>
+  </nav>
+</header>
+
+<div id="message" role="status" aria-live="polite"></div>
+
+<!-- HOME -->
+<section id="home" class="page">
+  <div class="hero">
+    <h1>Upgrade Your World with TechSavvy</h1>
+    <p>Discover smartphones, laptops, tablets, and accessories at great prices.</p>
+    <button class="btn" onclick="showPage('shop')">Explore Products</button>
+  </div>
+  <div class="container">
+    <h2 class="title">Shop by Category</h2>
+    <div id="homeCategories" class="category-list"></div>
+    <h2 class="title">Browse Subcategories</h2>
+    <div id="homeSubcategories" class="category-list"></div>
+    <div class="row">
+      <h2 class="title">Popular Products</h2>
+      <button class="btn" onclick="showPage('shop')">View All Products</button>
+    </div>
+    <div id="popularProducts" class="grid"></div>
+    <div class="panel" style="margin-top:25px">
+      <h2>Exclusive Offers 🎉</h2>
+      <p>Discover special discounts on selected electronics.</p>
+      <p class="muted">Prices and discounts shown here are sample project data.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP -->
+<section id="shop" class="page hidden">
+  <div class="container">
+    <h2 class="title">Product Catalogue</h2>
+    <div class="filters">
+      <input id="search" placeholder="Search products..." oninput="renderProducts()">
+      <select id="categoryFilter" onchange="renderProducts()"><option value="">All categories</option></select>
+      <select id="subcategoryFilter" onchange="renderProducts()"><option value="">All subcategories</option></select>
+      <select id="sortFilter" onchange="renderProducts()">
+        <option value="">Sort by</option>
+        <option value="low">Price: Low to High</option>
+        <option value="high">Price: High to Low</option>
+        <option value="name">Name: A–Z</option>
+      </select>
+    </div>
+    <div id="products" class="grid"></div>
+  </div>
+</section>
+
+<!-- PRODUCT DETAILS -->
+<section id="details" class="page hidden">
+  <div class="container">
+    <button class="btn light" onclick="showPage('shop')">← Back to Shop</button>
+    <div id="productDetails" class="panel" style="margin-top:20px"></div>
+  </div>
+</section>
+
+<!-- CART -->
+<section id="cart" class="page hidden">
+  <div class="container">
+    <h2 class="title">Shopping Cart</h2>
+    <div class="panel">
+      <div id="cartItems"></div>
+      <hr>
+      <div class="row"><h3>Total: <span id="cartTotal">₹0</span></h3>
+        <button class="btn green" onclick="showPage('checkout')">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHECKOUT -->
+<section id="checkout" class="page hidden">
+  <div class="container">
+    <h2 class="title">Checkout</h2>
+    <div class="two-col">
+      <div class="panel">
+        <form id="checkoutForm">
+          <div class="field"><label for="buyerName">Full Name</label><input id="buyerName" required></div>
+          <div class="field"><label for="buyerEmail">Email</label><input id="buyerEmail" type="email" required></div>
+          <div class="field"><label for="buyerPhone">Phone</label><input id="buyerPhone" type="tel" required></div>
+          <div class="field"><label for="address">Delivery Address</label><textarea id="address" required></textarea></div>
+          <div class="field"><label for="payment">Payment Method</label>
+            <select id="payment"><option>Cash on Delivery (Demo)</option><option>Card Payment (Demo)</option><option>UPI (Demo)</option></select>
+          </div>
+          <button class="btn green" type="submit">Place Order</button>
+        </form>
+        <p class="muted" style="margin-top:10px">No real payment is collected by this demo.</p>
+      </div>
+      <div class="panel">
+        <h3>Order Summary</h3>
+        <div id="checkoutSummary"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WISHLIST -->
+<section id="wishlist" class="page hidden">
+  <div class="container">
+    <h2 class="title">My Wishlist ❤️</h2>
+    <div id="wishlistProducts" class="grid"></div>
+  </div>
+</section>
+
+<!-- ORDERS -->
+<section id="orders" class="page hidden">
+  <div class="container">
+    <h2 class="title">My Orders & Order History</h2>
+    <div class="panel">
+      <div class="field"><label for="trackId">Track an order by order ID</label><input id="trackId" placeholder="e.g. TS123456"></div>
+      <button class="btn" onclick="trackOrder()">Track Order</button>
+      <div id="trackingResult"></div>
+    </div>
+    <div id="orderHistory"></div>
+  </div>
+</section>
+
+<!-- ACCOUNT -->
+<section id="account" class="page hidden">
+  <div class="container">
+    <h2 class="title">Customer Account</h2>
+    <div class="two-col">
+      <div class="panel">
+        <h3>Create Account</h3>
+        <form id="signupForm">
+          <div class="field"><label for="signupName">Name</label><input id="signupName" required></div>
+          <div class="field"><label for="signupEmail">Email</label><input id="signupEmail" type="email" required></div>
+          <div class="field"><label for="signupPassword">Password</label><input id="signupPassword" type="password" minlength="6" required></div>
+          <button class="btn" type="submit">Sign Up</button>
+        </form>
+      </div>
+      <div class="panel">
+        <h3>Login</h3>
+        <form id="loginForm">
+          <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" required></div>
+          <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" required></div>
+          <button class="btn" type="submit">Login</button>
+        </form>
+        <hr>
+        <h3>Current User</h3>
+        <p id="currentUserInfo">You are browsing as a guest.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section id="admin" class="page hidden">
+  <div class="container">
+    <h2 class="title">Administrator Dashboard</h2>
+    <div class="notice">Demo panel only. Production admin access must be protected by server-side authentication and permissions.</div>
+    <div class="panel">
+      <h3>Add New Product</h3>
+      <form id="productForm">
+        <div class="field"><label for="newName">Product Name</label><input id="newName" required></div>
+        <div class="field"><label for="newCategory">Category</label>
+          <select id="newCategory"><option>Smartphones</option><option>Laptops</option><option>Tablets</option><option>Accessories</option></select></div>
+        <div class="field"><label for="newSubcategory">Subcategory</label><input id="newSubcategory" placeholder="e.g. Android, Gaming, Audio" required></div>
+        <div class="field"><label for="newPrice">Price (₹)</label><input id="newPrice" type="number" min="1" required></div>
+        <div class="field"><label for="newDescription">Description</label><textarea id="newDescription" required></textarea></div>
+        <div class="field"><label for="newStock">Available Stock</label><input id="newStock" type="number" min="0" value="10" required></div>
+        <div class="field"><label for="newEmoji">Product Icon / Emoji</label><input id="newEmoji" value="📦" maxlength="8"></div>
+        <button class="btn green" type="submit">Add Product</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h3>Manage Products</h3>
+      <div id="adminProducts" class="table-wrap"></div>
+    </div>
+    <div class="panel">
+      <h3>Customer Checkout Information & Orders</h3>
+      <div id="adminOrders" class="table-wrap"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <h3>⚡ TechSavvy Electronics</h3>
+  <p>Smart technology. Smarter shopping.</p>
+  <p>Academic Project Demonstration © 2026</p>
+</footer>
+
+<script>
+// ================= PRODUCT DATA =================
+const defaultProducts = [
+ {id:1,name:"Nova X Smartphone",category:"Smartphones",subcategory:"Android",
+  price:24999,oldPrice:29999,stock:12,emoji:"📱",
+  description:"A modern smartphone with a vibrant display, quality camera and fast performance."},
+ {id:2,name:"iPhone Pro Smartphone",category:"Smartphones",subcategory:"Premium Phones",
+  price:79999,oldPrice:84999,stock:8,emoji:"📱",
+  description:"A premium smartphone designed for performance, photography and everyday productivity."},
+ {id:3,name:"UltraBook Laptop",category:"Laptops",subcategory:"Ultrabooks",
+  price:64999,oldPrice:69999,stock:7,emoji:"💻",
+  description:"A lightweight laptop suitable for study, office work and entertainment."},
+ {id:4,name:"Gaming Laptop",category:"Laptops",subcategory:"Gaming",
+  price:89999,oldPrice:99999,stock:5,emoji:"🎮",
+  description:"A powerful laptop for gaming, creative applications and demanding workloads."},
+ {id:5,name:"TabPlus Tablet",category:"Tablets",subcategory:"Android Tablets",
+  price:19999,oldPrice:22999,stock:10,emoji:"📲",
+  description:"A versatile tablet for reading, video calls, learning and entertainment."},
+ {id:6,name:"Wireless Headphones",category:"Accessories",subcategory:"Audio",
+  price:2999,oldPrice:3999,stock:20,emoji:"🎧",
+  description:"Comfortable wireless headphones for music, meetings and travel."},
+ {id:7,name:"Fast Charger",category:"Accessories",subcategory:"Chargers",
+  price:999,oldPrice:1299,stock:30,emoji:"🔌",
+  description:"A compact charger for compatible electronic devices."},
+ {id:8,name:"Wireless Mouse",category:"Accessories",subcategory:"Computer Accessories",
+  price:799,oldPrice:1099,stock:25,emoji:"🖱️",
+  description:"An ergonomic wireless mouse for work and everyday computing."}
+];
+
+function load(key,fallback) {
+ try { const v=JSON.parse(localStorage.getItem(key)); return v===null?fallback:v; }
+ catch { return fallback; }
+}
+function save(key,value) { localStorage.setItem(key,JSON.stringify(value)); }
+let products=load("tsProducts",defaultProducts);
+let cart=load("tsCart",[]);
+let wishlist=load("tsWishlist",[]);
+let orders=load("tsOrders",[]);
+let users=load("tsUsers",[]);
+let currentUser=load("tsCurrentUser",null);
+let activeProductId=null;
+
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Number(n).toLocaleString("en-IN");
+const safe=value=>String(value??"").replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+function notify(text) {
+ $("message").textContent=text;
+ setTimeout(()=>{if($("message").textContent===text)$("message").textContent="";},3500);
+}
+function persist() {
+ save("tsProducts",products); save("tsCart",cart);
+ save("tsWishlist",wishlist); save("tsOrders",orders);
+ save("tsUsers",users);
+}
+function showPage(id) {
+ document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+ $(id).classList.remove("hidden");
+ if(id==="home")renderHome();
+ if(id==="shop")renderProducts();
+ if(id==="details")renderDetails(activeProductId);
+ if(id==="cart")renderCart();
+ if(id==="checkout")renderCheckout();
+ if(id==="wishlist")renderWishlist();
+ if(id==="orders")renderOrders();
+ if(id==="account")renderAccount();
+ if(id==="admin")renderAdmin();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ================= CATEGORIES =================
+function categories() {
+ return [...new Set(products.map(p=>p.category))];
+}
+function renderCategoryControls() {
+ const cats=categories();
+ $("homeCategories").innerHTML=cats.map(c=>
+  `<button onclick="filterCategory('${safe(c)}')">${safe(c)}</button>`).join("");
+ const subs=[...new Set(products.map(p=>p.subcategory))];
+ $("homeSubcategories").innerHTML=subs.map(s=>
+  `<button onclick="filterSubcategory('${safe(s)}')">${safe(s)}</button>`).join("");
+ $("categoryFilter").innerHTML='<option value="">All categories</option>'+
+  cats.map(c=>`<option>${safe(c)}</option>`).join("");
+ updateSubcategories();
+}
+function updateSubcategories() {
+ const category=$("categoryFilter").value;
+ const subs=[...new Set(products.filter(p=>!category||p.category===category).map(p=>p.subcategory))];
+ const previous=$("subcategoryFilter").value;
+ $("subcategoryFilter").innerHTML='<option value="">All subcategories</option>'+
+  subs.map(s=>`<option>${safe(s)}</option>`).join("");
+ if(subs.includes(previous))$("subcategoryFilter").value=previous;
+}
+function filterCategory(category) {
+ showPage("shop");
+ $("categoryFilter").value=category;
+ updateSubcategories();
+ renderProducts();
+}
+function filterSubcategory(subcategory) {
+ showPage("shop");
+ const p=products.find(p=>p.subcategory===subcategory);
+ $("categoryFilter").value=p?.category||"";
+ updateSubcategories();
+ $("subcategoryFilter").value=subcategory;
+ renderProducts();
+}
+
+// ================= PRODUCT CATALOGUE =================
+function productCard(p) {
+ return `<article class="card">
+  <div class="product-image">${safe(p.emoji||"📦")}</div>
+  <div class="card-body">
+   <span class="badge">${safe(p.category)}</span>
+   <h3>${safe(p.name)}</h3>
+   <p>${safe(p.subcategory)}</p>
+   <p class="price">${money(p.price)} <span class="old-price">${money(p.oldPrice||p.price)}</span></p>
+   <p>${p.stock>0?"In stock: "+p.stock:"Out of stock"}</p>
+   <button class="btn light" onclick="viewDetails(${p.id})">Details</button>
+   <button class="btn" onclick="addToCart(${p.id})" ${p.stock<1?"disabled":""}>Add to Cart</button>
+   <button class="btn dark" onclick="toggleWishlist(${p.id})">♡ Wishlist</button>
+  </div></article>`;
+}
+function renderHome() {
+ renderCategoryControls();
+ $("popularProducts").innerHTML=products.slice().sort((a,b)=>b.stock-a.stock).slice(0,4).map(productCard).join("");
+}
+function renderProducts() {
+ if(!$("products"))return;
+ updateSubcategories();
+ const q=($("search").value||"").toLowerCase();
+ const category=$("categoryFilter").value;
+ const subcategory=$("subcategoryFilter").value;
+ const sort=$("sortFilter").value;
+ let list=products.filter(p=>
+  (p.name+" "+p.description+" "+p.category+" "+p.subcategory).toLowerCase().includes(q) &&
+  (!category||p.category===category) && (!subcategory||p.subcategory===subcategory));
+ if(sort==="low")list.sort((a,b)=>a.price-b.price);
+ if(sort==="high")list.sort((a,b)=>b.price-a.price);
+ if(sort==="name")list.sort((a,b)=>a.name.localeCompare(b.name));
+ $("products").innerHTML=list.length?list.map(productCard).join(""):"<p>No products found.</p>";
+}
+function viewDetails(id) {
+ activeProductId=id;
+ showPage("details");
+}
+function renderDetails(id) {
+ const p=products.find(p=>p.id===Number(id));
+ if(!p){$("productDetails").innerHTML="<p>Product not found.</p>";return;}
+ $("productDetails").innerHTML=`
+  <div class="product-image" style="font-size:90px">${safe(p.emoji||"📦")}</div>
+  <h2 style="margin-top:15px">${safe(p.name)}</h2>
+  <p>Category: ${safe(p.category)} / ${safe(p.subcategory)}</p>
+  <p class="price">${money(p.price)} <span class="old-price">${money(p.oldPrice||p.price)}</span></p>
+  <p>Availability: ${p.stock>0?"In stock":"Out of stock"}</p>
+  <p>${safe(p.description)}</p>
+  <p>Customer reviews: ${renderProductReviews(p.id)}</p>
+  <button class="btn" onclick="addToCart(${p.id})" ${p.stock<1?"disabled":""}>Add to Cart</button>
+  <button class="btn dark" onclick="toggleWishlist(${p.id})">Add to Wishlist</button>
+  <hr><h3>Leave a Product Review</h3>
+  <form onsubmit="submitProductReview(event,${p.id})">
+   <div class="field"><label>Your Name</label><input name="reviewer" required></div>
+   <div class="field"><label>Rating</label><select name="rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+   <div class="field"><label>Review</label><textarea name="review" required></textarea></div>
+   <button class="btn" type="submit">Submit Review</button>
+  </form>`;
+}
+let productReviews=load("tsReviews",[]);
+function renderProductReviews(id) {
+ const rs=productReviews.filter(r=>r.productId===id);
+ if(!rs.length)return "No reviews yet";
+ return rs.map(r=>`<p>⭐ ${r.rating}/5 — ${safe(r.reviewer)}: ${safe(r.text)}</p>`).join("");
+}
+function submitProductReview(e,id) {
+ e.preventDefault();
+ const f=e.target;
+ productReviews.unshift({id:Date.now(),productId:id,
+  reviewer:f.reviewer.value.trim(),rating:Number(f.rating.value),text:f.review.value.trim()});
+ save("tsReviews",productReviews);
+ renderDetails(id);
+ notify("Product review submitted.");
+}
+
+// ================= CART =================
+function updateCartCount() {
+ $("cartCount").textContent=cart.reduce((sum,i)=>sum+i.quantity,0);
+}
+function addToCart(id) {
+ const p=products.find(p=>p.id===id);
+ if(!p||p.stock<1){notify("Product is unavailable.");return;}
+ const item=cart.find(i=>i.id===id);
+ if(item) {
+  if(item.quantity>=p.stock){notify("Maximum available stock reached.");return;}
+  item.quantity++;
+ } else cart.push({id,quantity:1});
+ persist(); updateCartCount(); notify("Product added to cart.");
+}
+function changeQuantity(id,delta) {
+ const item=cart.find(i=>i.id===id);
+ const p=products.find(p=>p.id===id);
+ if(!item||!p)return;
+ const next=item.quantity+delta;
+ if(next>p.stock){notify("Not enough stock available.");return;}
+ if(next<=0)cart=cart.filter(i=>i.id!==id);
+ else item.quantity=next;
+ persist(); renderCart(); updateCartCount();
+}
+function removeFromCart(id) {
+ cart=cart.filter(i=>i.id!==id);
+ persist(); renderCart(); updateCartCount();
+ notify("Item removed from cart.");
+}
+function cartTotal() {
+ return cart.reduce((sum,i)=>sum+(products.find(p=>p.id===i.id)?.price||0)*i.quantity,0);
+}
+function renderCart() {
+ const valid=cart.filter(i=>products.some(p=>p.id===i.id));
+ if(valid.length!==cart.length){cart=valid;persist();}
+ $("cartItems").innerHTML=cart.length?cart.map(i=>{
+  const p=products.find(p=>p.id===i.id);
+  return `<div class="row panel"><div><h3>${safe(p.name)}</h3>
+   <p>${money(p.price)} each</p><p>Quantity: ${i.quantity}</p></div>
+   <div><button class="btn small" onclick="changeQuantity(${p.id},-1)">−</button>
+   <button class="btn small" onclick="changeQuantity(${p.id},1)">+</button>
+   <button class="btn red small" onclick="removeFromCart(${p.id})">Remove</button></div>
+   <strong>${money(p.price*i.quantity)}</strong></div>`;
+ }).join(""):"<p>Your cart is empty. <button class='btn' onclick=\"showPage('shop')\">Shop now</button></p>";
+ $("cartTotal").textContent=money(cartTotal());
+ updateCartCount();
+}
+function renderCheckout() {
+ $("checkoutSummary").innerHTML=cart.length?
+  cart.map(i=>{const p=products.find(p=>p.id===i.id);return `<p>${safe(p.name)} × ${i.quantity} — ${money(p.price*i.quantity)}</p>`;}).join("")+
+  `<hr><h3>Total: ${money(cartTotal())}</h3>`:"<p>Your cart is empty.</p>";
+ if(currentUser) {
+  $("buyerName").value=currentUser.name;
+  $("buyerEmail").value=currentUser.email;
+ }
+}
+$("checkoutForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ if(!cart.length){notify("Your cart is empty.");return;}
+ for(const i of cart) {
+  const p=products.find(p=>p.id===i.id);
+  if(!p||i.quantity>p.stock){notify("Stock changed. Please update your cart.");return;}
+ }
+ const order={
+  id:"TS"+String(Date.now()).slice(-8),
+  customer:$("buyerName").value.trim(),
+  email:$("buyerEmail").value.trim().toLowerCase(),
+  phone:$("buyerPhone").value.trim(),
+  address:$("address").value.trim(),
+  payment:$("payment").value,
+  items:cart.map(i=>({id:i.id,name:products.find(p=>p.id===i.id).name,
+    price:products.find(p=>p.id===i.id).price,quantity:i.quantity})),
+  total:cartTotal(),status:"Order Placed",date:new Date().toLocaleString()
+ };
+ // Demo order creation only. A server must validate stock and payment.
+ order.items.forEach(i=>{
+  const p=products.find(p=>p.id===i.id);
+  p.stock-=i.quantity;
+ });
+ orders.unshift(order);
+ cart=[];
+ persist();
+ e.target.reset();
+ updateCartCount();
+ renderAdmin();
+ renderProducts();
+ notify("Order placed! Order ID: "+order.id);
+ showPage("orders");
+});
+
+// ================= WISHLIST =================
+function toggleWishlist(id) {
+ wishlist=wishlist.includes(id)?wishlist.filter(x=>x!==id):[...wishlist,id];
+ persist(); renderWishlist();
+ notify("Wishlist updated.");
+}
+function renderWishlist() {
+ const list=products.filter(p=>wishlist.includes(p.id));
+ $("wishlistProducts").innerHTML=list.length?list.map(p=>`
+  <article class="card"><div class="product-image">${safe(p.emoji||"📦")}</div>
+  <div class="card-body"><h3>${safe(p.name)}</h3><p class="price">${money(p.price)}</p>
+  <button class="btn" onclick="addToCart(${p.id})">Add to Cart</button>
+  <button class="btn red" onclick="toggleWishlist(${p.id})">Remove</button></div></article>`).join("")
+  :"<p>Your wishlist is empty.</p>";
+}
+
+// ================= ORDERS AND TRACKING =================
+function customerOrders() {
+ return currentUser?orders.filter(o=>o.email.toLowerCase()===currentUser.email.toLowerCase()):[];
+}
+function renderOrders() {
+ const list=customerOrders();
+ $("orderHistory").innerHTML=list.length?list.map(o=>`
+  <div class="panel"><div class="row"><h3>Order ${safe(o.id)}</h3>
+  <span class="badge">${safe(o.status)}</span></div>
+  <p>Date: ${safe(o.date)}</p>
+  <p>Total: ${money(o.total)}</p>
+  <p>Payment: ${safe(o.payment)}</p>
+  <p>${o.items.map(i=>safe(i.name)+" × "+i.quantity).join(", ")}</p>
+  <button class="btn small" onclick="trackSpecific('${safe(o.id)}')">Track Order</button></div>`).join("")
+  :"<p>No orders found for the logged-in customer. Log in with the checkout email to see order history.</p>";
+}
+function trackSpecific(id) {
+ $("trackId").value=id;
+ trackOrder();
+}
+function trackOrder() {
+ const id=$("trackId").value.trim().toUpperCase();
+ const order=orders.find(o=>o.id.toUpperCase()===id);
+ $("trackingResult").innerHTML=order?
+  `<div class="notice"><h3>Order ${safe(order.id)}</h3>
+  <p>Status: <strong>${safe(order.status)}</strong></p>
+  <p>Order total: ${money(order.total)}</p><p>Placed: ${safe(order.date)}</p></div>`
+  :"<p>Order not found.</p>";
+}
+
+// ================= ACCOUNT =================
+$("signupForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const email=$("signupEmail").value.trim().toLowerCase();
+ if(users.some(u=>u.email.toLowerCase()===email)){notify("Email already registered.");return;}
+ const u={name:$("signupName").value.trim(),email,password:$("signupPassword").value};
+ users.push(u);
+ currentUser={name:u.name,email:u.email};
+ save("tsCurrentUser",currentUser); persist();
+ e.target.reset(); renderAccount();
+ notify("Demo account created.");
+});
+$("loginForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const email=$("loginEmail").value.trim().toLowerCase();
+ const password=$("loginPassword").value;
+ const u=users.find(u=>u.email.toLowerCase()===email&&u.password===password);
+ if(!u){notify("Invalid email or password.");return;}
+ currentUser={name:u.name,email:u.email};
+ save("tsCurrentUser",currentUser);
+ e.target.reset(); renderAccount(); notify("Login successful.");
+});
+function logout() {
+ currentUser=null; localStorage.removeItem("tsCurrentUser");
+ renderAccount(); notify("Logged out.");
+}
+function renderAccount() {
+ $("currentUserInfo").textContent=currentUser?
+  "Logged in as "+currentUser.name+" ("+currentUser.email+")":"You are browsing as a guest.";
+}
+
+// ================= ADMIN PRODUCT MANAGEMENT =================
+$("productForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ products.push({
+  id:Date.now(),name:$("newName").value.trim(),category:$("newCategory").value,
+  subcategory:$("newSubcategory").value.trim(),price:Number($("newPrice").value),
+  oldPrice:Number($("newPrice").value),stock:Number($("newStock").value),
+  description:$("newDescription").value.trim(),emoji:$("newEmoji").value.trim()||"📦"
+ });
+ persist(); e.target.reset(); $("newEmoji").value="📦";
+ renderAdmin(); renderHome(); renderProducts();
+ notify("Product added.");
+});
+function renderAdmin() {
+ $("adminProducts").innerHTML=products.length?`
+ <table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody>
+ ${products.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.category)} / ${safe(p.subcategory)}</td>
+ <td>${money(p.price)}</td><td>${p.stock}</td><td>
+ <button class="btn small" onclick="editProduct(${p.id})">Edit</button>
+ <button class="btn red small" onclick="deleteProduct(${p.id})">Remove</button></td></tr>`).join("")}
+ </tbody></table>`:"<p>No products.</p>";
+ $("adminOrders").innerHTML=orders.length?`
+ <table><thead><tr><th>Order ID</th><th>Customer</th><th>Contact</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>
+ ${orders.map(o=>`<tr><td>${safe(o.id)}</td><td>${safe(o.customer)}</td>
+ <td>${safe(o.email)}<br>${safe(o.phone)}<br>${safe(o.address)}</td>
+ <td>${o.items.map(i=>safe(i.name)+" × "+i.quantity).join("<br>")}</td><td>${money(o.total)}</td>
+ <td><select onchange="changeOrderStatus('${safe(o.id)}',this.value)">
+ ${["Order Placed","Processing","Shipped","Delivered","Cancelled"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}
+ </select></td></tr>`).join("")}</tbody></table>`:"<p>No customer orders yet.</p>";
+}
+function editProduct(id) {
+ const p=products.find(p=>p.id===id);
+ if(!p)return;
+ const price=prompt("Enter new price (₹):",p.price);
+ if(price===null)return;
+ if(!Number.isFinite(Number(price))||Number(price)<=0){notify("Enter a valid positive price.");return;}
+ const description=prompt("Update product description:",p.description);
+ if(description===null)return;
+ const name=prompt("Update product name:",p.name);
+ if(name===null)return;
+ p.price=Number(price);
+ p.description=description.trim();
+ p.name=name.trim()||p.name;
+ persist(); renderAdmin(); renderHome(); renderProducts();
+ notify("Product updated.");
+}
+function deleteProduct(id) {
+ if(!confirm("Remove this product from the catalogue?"))return;
+ products=products.filter(p=>p.id!==id);
+ cart=cart.filter(i=>i.id!==id);
+ wishlist=wishlist.filter(i=>i!==id);
+ persist(); updateCartCount(); renderAdmin(); renderHome(); renderProducts();
+ notify("Product removed.");
+}
+function changeOrderStatus(id,status) {
+ const order=orders.find(o=>o.id===id);
+ if(!order)return;
+ order.status=status;
+ persist(); renderAdmin(); renderOrders();
+ notify("Order status updated.");
+}
+
+// ================= INITIALISE =================
+function initialise() {
+ renderCategoryControls();
+ renderHome();
+ renderProducts();
+ renderCart();
+ renderWishlist();
+ renderOrders();
+ renderAccount();
+ renderAdmin();
+ updateCartCount();
+}
+initialise();
+</script>
+</body>
+</html>
